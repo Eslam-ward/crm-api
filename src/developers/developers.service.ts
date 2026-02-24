@@ -1,4 +1,4 @@
-import { BadRequestException, ConflictException, Injectable } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateDeveloperDto } from './dto/create-developer.dto';
 import { UpdateDeveloperDto } from './dto/update-developer.dto';
 import { Developer } from './schema/developer.schema';
@@ -6,11 +6,19 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { ApiFeatures } from 'src/common/utils/api-features';
 import { buildQueryDto } from 'src/common/dto/base-query.dto';
+import { Project, ProjectDocument } from 'src/projects/schema/project.schema';
 
 @Injectable()
 export class DevelopersService {
-  constructor(  @InjectModel(Developer.name)
-      private readonly developerModel: Model<Developer>) {}
+  constructor(  
+    @InjectModel(Developer.name)
+      private readonly developerModel: Model<Developer>,
+
+    @InjectModel(Project.name)
+    private readonly projectModel: Model<ProjectDocument>,
+      
+     
+    ) {}
 
   async create(createDeveloperDto: CreateDeveloperDto) {
     const existingDeveloper = await this.developerModel.findOne({
@@ -67,11 +75,14 @@ async findAll(query:buildQueryDto) {
 
   }
 
-  remove(id:string) {
-    const developer = this.developerModel.findById({_id: id,});
-    if (!developer) {
-      throw new BadRequestException('Developer not found');
-    }
-    return this.developerModel.findByIdAndDelete(id);
+  async remove(id: string): Promise<string> {
+    const developer = await this.developerModel.findById(id);
+    if (!developer) throw new NotFoundException('Developer not found');
+    // Delete all projects associated with this developer
+   const projects = await this.projectModel.find({ developer: id });
+    await Promise.all(projects.map((p) => p.deleteOne()));
+    await developer.deleteOne();
+    return 'Developer and all associated projects deleted successfully';
   }
 }
+

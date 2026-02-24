@@ -1,0 +1,55 @@
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document, Types } from 'mongoose';
+import { Developer } from 'src/developers/schema/developer.schema';
+
+export type ProjectDocument = Project & Document;
+
+export enum ProjectStatus {
+  ACTIVE = 'Active',
+  INACTIVE = 'Inactive',
+  SOLD_OUT = 'Sold Out',
+}
+
+@Schema({ timestamps: true })
+export class Project {
+  @Prop({ required: true, trim: true })
+  name: string;
+
+  @Prop({ required: true, trim: true })
+  description: string;
+
+  @Prop({ required: true, trim: true })
+  location: string; 
+
+  @Prop({ required: true, trim: true })
+  area: string; 
+  @Prop({
+    type: Types.ObjectId,
+    ref: Developer.name,
+    required: true,
+  })
+  developer: Types.ObjectId; 
+
+  @Prop({ required: true })
+  startDate: Date;
+
+  @Prop({
+    enum: ProjectStatus,
+    default: ProjectStatus.ACTIVE,
+  })
+  status: ProjectStatus;
+
+  @Prop({  min: 0 })
+  totalUnits: number;
+
+  @Prop({  min: 0 })
+  availableUnits: number;
+
+  @Prop({ min: 0 })
+  soldUnits: number;
+
+   @Prop({ type: [String], required: true })
+  images: string[]; 
+}
+
+export const ProjectSchema = SchemaFactory.createForClass(Project);
