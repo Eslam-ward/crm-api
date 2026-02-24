@@ -1,11 +1,11 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 import { User, UserDocument } from './schema/users.schema';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiFeatures } from 'src/common/utils/api-features';
-import {buildQueryDto } from '../common/dto/base-query.dto';
+import {BuildQueryDto } from '../common/dto/base-query.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 
 @Injectable()
@@ -33,16 +33,26 @@ export class UsersService  {
     id: string,
     dto: UpdateUserDto,
   ): Promise<UserResponseDto> {
-    const user = await this.userModel.findOneAndUpdate(
-      { _id: id},
-      dto,
-      { new: true },
-    );
+     const user = await this.userModel.findById(id);
 
-    if (!user)
-      throw new NotFoundException(`No active user found with id: ${id}`);
+    if (!user)  throw new NotFoundException(`No active user found with id: ${id}`);
+    if (dto.email) {
+       const exists = await this.userModel.findOne({
+          email: dto.email,
+          _id: { $ne: id },
+       });
 
-    return UserResponseDto.fromEntity(user);
+  if (exists) {
+    throw new ConflictException('Email already used');
+  }
+}
+
+Object.assign(user, dto);
+await user.save();
+
+return UserResponseDto.fromEntity(user);
+
+  
   }
 
   //  Soft Delete
@@ -61,7 +71,7 @@ export class UsersService  {
 
   //  Find All (only active users)
 
-async findAll(query: buildQueryDto) {
+async findAll(query: BuildQueryDto) {
   const features = new ApiFeatures(
     this.userModel.find({ active: true }),
     query,

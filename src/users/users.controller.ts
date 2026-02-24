@@ -12,7 +12,7 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { buildQueryDto } from '../common/dto/base-query.dto';
+import { BuildQueryDto } from '../common/dto/base-query.dto';
 import { UserDocument } from './schema/users.schema';
 import { UserResponseDto } from './dto/user-response.dto';
 import { Roles } from 'src/common/decorators/roles.decorator';
@@ -25,7 +25,7 @@ export class UsersController {
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles('admin')
   @Get()
-  async findAll(@Query() query: buildQueryDto) {
+  async findAll(@Query() query: BuildQueryDto) {
     return this.usersService.findAll(query);
   }
 

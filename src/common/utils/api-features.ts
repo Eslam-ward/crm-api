@@ -43,7 +43,7 @@ export class ApiFeatures<T extends Document> implements IQueryBuilder<T> {
       const fields = this.queryString.fields.split(',').join(' ');
       this.mongooseQuery = this.mongooseQuery.select(fields);
     } else {
-      this.mongooseQuery = this.mongooseQuery.select('-__v ');
+      this.mongooseQuery = this.mongooseQuery.select('-__v');
     }
     return this;
   }
