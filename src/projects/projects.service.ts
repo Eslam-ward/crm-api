@@ -10,9 +10,8 @@ import { UpdateProjectDto } from './dto/update-project.dto';
 import { UploadService  } from 'src/common/storage/upload.service';
 import { ApiFeatures } from 'src/common/utils/api-features';
 import { buildQueryDto } from 'src/common/dto/base-query.dto';
-const PROJECT_IMAGE_CONFIG = {
-  allowedTypes: ['image/jpeg', 'image/png', 'image/webp'],
-};
+import { ProjectBuilder } from './builders/project.builder';
+
 
 @Injectable()
 export class ProjectsService {
@@ -20,24 +19,19 @@ export class ProjectsService {
     @InjectModel(Project.name)
     private readonly projectModel: Model<ProjectDocument>,
     private readonly imageService: UploadService,
+    private readonly projectBuilder: ProjectBuilder,
   ) {}
 
-  async create(
-    dto: CreateProjectDto,
-    files: Express.Multer.File[],
-  ) {
-    const images = await this.imageService.upload(files, PROJECT_IMAGE_CONFIG.allowedTypes);
-
-    const project = await this.projectModel.create({
-      ...dto,
-      images,
-    });
+  async create(dto: CreateProjectDto, files: Express.Multer.File[]): Promise<Project> {
+    const project = await this.projectBuilder
+      .setBaseData(dto)
+      .setImages(files)
+      .then((builder) => builder.build());
 
     return project.toObject();
   }
 
 async findAll(query: buildQueryDto) {
-  const totalDocuments = await this.projectModel.countDocuments();
 
   const features = new ApiFeatures(
     this.projectModel.find().populate('developer', 'name -_id'),
