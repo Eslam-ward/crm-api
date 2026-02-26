@@ -6,10 +6,10 @@ import configuration from './config/configuration';
 import { validationSchema } from './config/validation';
 import { AuthModule } from './auth/auth.module';
 import { UserModule } from './users/users.module';
-import { UnitsModule } from './units/units.module';
 import { DevelopersModule } from './developers/developers.module';
 import { ProjectsModule } from './projects/projects.module';
 import { StorageModule } from './common/storage/storage.module';
+import { UnitsModule } from './units/units.module';
 
 
 @Module({
@@ -33,10 +33,10 @@ import { StorageModule } from './common/storage/storage.module';
 
     AuthModule,
     UserModule,
-    UnitsModule,
     DevelopersModule,
     ProjectsModule,
-    StorageModule
+    StorageModule,
+    UnitsModule
  
   ],
 })

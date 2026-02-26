@@ -38,22 +38,8 @@ export class CreateProjectDto {
 
   @IsEnum(ProjectStatus)
   @IsOptional()
-  status?: ProjectStatus;
+  status: ProjectStatus;
 
-  @IsOptional()
-  @IsNumber()
-  @Min(0)
-  totalUnits?: number;
-
-  @IsOptional()
-  @IsNumber()
-  @Min(0)
-  availableUnits?: number;
-
-  @IsOptional()
-  @IsNumber()
-  @Min(0)
-  soldUnits?: number;
 
   // images will be injected by the controller after upload — not sent by client
 }
