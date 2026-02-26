@@ -39,17 +39,12 @@ export class Project {
   })
   status: ProjectStatus;
 
-  @Prop({  min: 0 })
-  totalUnits: number;
-
-  @Prop({  min: 0 })
-  availableUnits: number;
-
-  @Prop({ min: 0 })
-  soldUnits: number;
 
    @Prop({ type: [String], required: true })
   images: string[]; 
 }
 
 export const ProjectSchema = SchemaFactory.createForClass(Project);
+ProjectSchema.index({ developer: 1 });
+ProjectSchema.index({ area: 1 });
+ProjectSchema.index({ status: 1 });

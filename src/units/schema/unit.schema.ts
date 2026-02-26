@@ -1,76 +1,77 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument, Types } from 'mongoose';
-import { Developer } from '../../developers/schema/developer.schema';
+import { Document, Types } from 'mongoose';
+import { UnitStatus } from '../enums/unit-status.enum';
+import { UnitType } from '../enums/unit-type.enum';
+import { UnitPurpose } from '../enums/unit-purpose.enum';
 
-export type UnitDocument = HydratedDocument<Unit>;
-
-export enum UnitStatus {
-  AVAILABLE = 'available',
-  RESERVED = 'reserved',
-  SOLD = 'sold',
-}
-
-export enum UnitType {
-  APARTMENT = 'apartment',
-  VILLA = 'villa',
-  STUDIO = 'studio',
-}
+export type UnitDocument = Unit & Document;
 
 @Schema({ timestamps: true })
 export class Unit {
+  @Prop({ type: Types.ObjectId, ref: 'Project', required: true,index:true})
+  project: Types.ObjectId;
 
-  @Prop({ required: true, unique: true })
+  @Prop({ required: true, trim: true ,unique:true}) 
   unitCode: string;
 
-  @Prop({ required: true, enum: UnitType })
-  type: string;
+  @Prop({
+    type: String,
+    enum: UnitType,
+    required: true,
+    index: true,
+  })
+  type: UnitType;
 
-  @Prop({ required: true })
-  purpose: string;
+  @Prop({
+    type: String,
+    enum: UnitPurpose,
+    required: true,
+    index: true,
+  })
+  purpose: UnitPurpose;
+
+  @Prop({ required: true, min: 0 })
+  price: number;
 
   @Prop({ required: true })
   area: string;
 
-  @Prop()
-  phase: string;
-
-  @Prop()
+  @Prop({ min: 0 })
   floor: number;
 
-  @Prop()
-  apartmentNumber: string;
+  @Prop({ trim: true })
+  phase: string;
 
-  @Prop({
-    type: Types.ObjectId,
-    ref: Developer.name,
-    required: true,
-    
-  })
-  developer: Types.ObjectId;
+  @Prop({ min: 0 })
+  apartmentNumber: number;
 
-  @Prop({ required: true })
-  price: number;
+  @Prop({ required: true, min: 0 })
+  bedrooms: number;
+
+  @Prop({ required: true, min: 0 })
+  bathrooms: number;
 
   @Prop({
     type: String,
     enum: UnitStatus,
     default: UnitStatus.AVAILABLE,
+    required: true,
+    index: true,
   })
-  status: string;
+  status: UnitStatus;
 
-  @Prop()
-  properties: {
-    size: number;
-  };
 
-  @Prop()
-  bedrooms: number;
-
-  @Prop()
-  bathroom: number;
-
-  @Prop({ type: [String] })
-  images: string[];
+ @Prop({ required: true, min: 0 })
+  size: number;
+ @Prop({ type: [String], required: true })
+ images: string[]; 
 }
 
 export const UnitSchema = SchemaFactory.createForClass(Unit);
+
+/**
+ * Compound Unique Index
+ * Prevent duplicate unitCode inside same project
+ */
+
+

@@ -39,15 +39,5 @@ export class CreateDeveloperDto {
   @IsOptional()
   area?: string[];
 
-  @Type(() => Number)
-  @IsNumber()
-  @Min(0)
-  @IsOptional()
-  numberOfProjects?: number;
 
-  @Type(() => Number)
-  @IsNumber()
-  @Min(0)
-  @IsOptional()
-  numberOfUnits?: number;
 }

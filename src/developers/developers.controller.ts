@@ -17,6 +17,16 @@ export class DevelopersController {
   findAll(@Query() query: BuildQueryDto) {
     return this.developersService.findAll(query);
   }
+   @Get('summary')
+  async getDashboardSummary() {
+    return this.developersService.getDeveloperDashboardSummary();
+  }
+ @Get(':id/summary')
+  async getDeveloperSummary(@Param('id') id: string) {
+    return this.developersService.getoneDeveloperDashboardSummary(id);
+  }
+
+
 
   @Get(':id')
   findOne(@Param('id') id: string) {

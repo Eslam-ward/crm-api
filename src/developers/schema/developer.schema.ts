@@ -28,10 +28,7 @@ export class Developer {
     @Prop({ type: [String] , trim: true })
     area: string[];
 
-    @Prop({ type: Number })
-    numberOfProjects: number;
-    @Prop({ type: Number })
-    numberOfUnits: number;
+
 
    
 

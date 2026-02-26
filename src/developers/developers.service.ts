@@ -3,9 +3,12 @@ import { CreateDeveloperDto } from './dto/create-developer.dto';
 import { UpdateDeveloperDto } from './dto/update-developer.dto';
 import { Developer } from './schema/developer.schema';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { ApiFeatures } from 'src/common/utils/api-features';
-
+import { buildQueryDto } from 'src/common/dto/base-query.dto';
+import { Project, ProjectDocument } from 'src/projects/schema/project.schema';
+import { UnitDocument } from 'src/units/schema/unit.schema';
+import { UnitStatus } from 'src/units/enums/unit-status.enum';
 
 @Injectable()
 export class DevelopersService {
@@ -15,6 +18,8 @@ export class DevelopersService {
 
     @InjectModel(Project.name)
     private readonly projectModel: Model<ProjectDocument>,
+    @InjectModel('Unit')
+    private unitModel: Model<UnitDocument>,
       
      
     ) {}
@@ -89,5 +94,98 @@ async findAll(query:BuildQueryDto) {
     await developer.deleteOne();
     return 'Developer and all associated projects deleted successfully';
   }
+
+  
+  async getDeveloperDashboardSummary() {
+  const [developers, projects, units] = await Promise.all([
+    this.developerModel.countDocuments(),
+    this.projectModel.countDocuments(),
+    this.unitModel.countDocuments(),
+  ]);
+
+  return {
+    totalDevelopers: developers,
+    totalProjects: projects,
+    totalUnits: units,
+  };
+}
+
+
+
+
+
+async getoneDeveloperDashboardSummary(developerId: string) {
+  const projectIds = await this.projectModel
+    .find({ developer: developerId })
+    .distinct('_id')
+    .lean();
+
+  const projectIdStrings = projectIds.map((id) => id.toString());
+
+  const [totalProjects, unitStats, activeAreas] = await Promise.all([
+    this.projectModel.countDocuments({ developer: developerId }),
+
+    this.unitModel.aggregate([
+      {
+        $match: {
+          project: { $in: projectIdStrings },
+        },
+      },
+      {
+        $group: {
+          _id: null,
+          totalUnits: { $sum: 1 },
+          availableUnits: {
+            $sum: { $cond: [{ $eq: ['$status', UnitStatus.AVAILABLE] }, 1, 0] },
+          },
+          soldUnits: {
+            $sum: { $cond: [{ $eq: ['$status', UnitStatus.SOLD] }, 1, 0] },
+          },
+          totalRevenue: {
+            $sum: { $cond: [{ $eq: ['$status', UnitStatus.SOLD] }, '$price', 0] },
+          },
+        },
+      },
+      { $project: { _id: 0 } },
+    ]),
+
+    this.projectModel.distinct('area', { developer: developerId }),
+  ]);
+
+  const units = unitStats[0] ?? {
+    totalUnits: 0,
+    availableUnits: 0,
+    soldUnits: 0,
+    totalRevenue: 0,
+  };
+
+  return {
+    totalProjects,
+    totalUnits: units.totalUnits,
+    availableUnits: units.availableUnits,
+    soldUnits: units.soldUnits,
+    totalRevenue: units.totalRevenue,
+    activeAreas,
+  };
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 

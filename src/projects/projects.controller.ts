@@ -2,6 +2,10 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { ProjectsService } from './projects.service';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
+import { buildQueryDto } from 'src/common/dto/base-query.dto';
+import { ParseObjectIdPipe } from '@nestjs/mongoose';
+
+const MAX_FILES = 5;
 
 @Controller('projects')
 export class ProjectsController {
@@ -22,15 +26,29 @@ export class ProjectsController {
     return this.projectsService.findAll(query);
   }
 
+@Get('stats')
+  getStats() {
+    return this.projectsService.getDashboardSummary();
+  }
+
+
+
+  @Get('summary/:id')
+  async getSummaryStats(@Param('id') projectId: string) {
+    return this.projectsService.getoneProductSummary(projectId);
+  }
+// 
+
+
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id', ParseObjectIdPipe) id: string) {
     return this.projectsService.findOne(id);
   }
 
   @Patch(':id')
   @UseInterceptors(FilesInterceptor('images', MAX_FILES))
   update(
-    @Param('id') id: string,
+    @Param('id', ParseObjectIdPipe) id: string,
     @Body() dto: UpdateProjectDto,
     @UploadedFiles() files?: Express.Multer.File[],
   ) {
@@ -44,7 +62,9 @@ export class ProjectsController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id', ParseObjectIdPipe) id: string) {
     return this.projectsService.remove(id);
   }
+
+
 }
