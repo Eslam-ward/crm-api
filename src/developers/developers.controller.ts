@@ -2,7 +2,7 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestj
 import { DevelopersService } from './developers.service';
 import { CreateDeveloperDto } from './dto/create-developer.dto';
 import { UpdateDeveloperDto } from './dto/update-developer.dto';
-import { buildQueryDto } from 'src/common/dto/base-query.dto';
+import { BuildQueryDto } from 'src/common/dto/base-query.dto';
 
 @Controller('developers')
 export class DevelopersController {
@@ -14,7 +14,7 @@ export class DevelopersController {
   }
 
   @Get()
-  findAll(@Query() query: buildQueryDto) {
+  findAll(@Query() query: BuildQueryDto) {
     return this.developersService.findAll(query);
   }
    @Get('summary')
@@ -39,7 +39,7 @@ export class DevelopersController {
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.developersService.remove(id);
+  delete(@Param('id') id: string) {
+    return this.developersService.delete(id);
   }
 }
