@@ -15,8 +15,8 @@ import { buildQueryDto } from 'src/common/dto/base-query.dto';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
- @UseGuards(JwtAuthGuard, RolesGuard)
- @Roles('admin')
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('admin')
 @ApiTags('Developers')
 @Controller('developers')
 export class DevelopersController {
