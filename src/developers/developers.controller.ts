@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards } from '@nestjs/common';
 import {
   ApiTags,
   ApiOperation,
@@ -13,8 +13,15 @@ import { CreateDeveloperDto } from './dto/create-developer.dto';
 import { UpdateDeveloperDto } from './dto/update-developer.dto';
 import { BuildQueryDto } from 'src/common/dto/base-query.dto';
 
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
+import { RolesGuard } from 'src/common/guards/roles.guard';
+
+
 @ApiTags('Developers')
 @Controller('developers')
+ @UseGuards(JwtAuthGuard, RolesGuard)
+ @Roles('admin')
 export class DevelopersController {
   constructor(private readonly developersService: DevelopersService) {}
 
