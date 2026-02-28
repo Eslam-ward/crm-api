@@ -3,7 +3,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 
 export function setupSwagger(app: INestApplication) {
   const config = new DocumentBuilder()
-    .setTitle('API Documentation')
+    .setTitle(' API Documentation')
     .setDescription('Real Estate System API')
     .setVersion('1.0')
     .addBearerAuth()

@@ -16,9 +16,18 @@ async function bootstrap() {
      transform: true,
     transformOptions: { enableImplicitConversion: true },
   }),
-
-
 );
+// Enable CORS for all origins (you can customize this for production)
+  app.enableCors({
+    origin: '*',
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    allowedHeaders: 'Content-Type, Accept, Authorization',
+  });
+
+
+
+
+
 
 
   setupSwagger(app);
