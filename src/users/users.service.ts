@@ -5,7 +5,7 @@ import { Model } from 'mongoose';
 import { User, UserDocument } from './schema/users.schema';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiFeatures } from 'src/common/utils/api-features';
-import { UsersQueryDto } from './dto/users-query.dto';
+import {buildQueryDto } from '../common/dto/base-query.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 
 @Injectable()
@@ -73,7 +73,7 @@ export class UsersService  {
 
   //  Find All (only active users)
 
-async findAll(query: UsersQueryDto) {
+async findAll(query: buildQueryDto) {
   const features = new ApiFeatures(
     this.userModel.find({ active: true }),
     query,

@@ -1,8 +1,6 @@
-
-
 import { IsOptional, IsString, IsNumberString, IsIn } from 'class-validator';
 
-export class UsersQueryDto {
+export class buildQueryDto {
   @IsOptional()
   @IsString()
   keyword?: string;
@@ -23,7 +21,5 @@ export class UsersQueryDto {
   @IsString()
   fields?: string;
 
-  @IsOptional()
-  @IsIn(['true', 'false'])
-  isActive?: string;
+ 
 }
