@@ -1,15 +1,19 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 
 import { User, UserDocument } from './schema/users.schema';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiFeatures } from 'src/common/utils/api-features';
-import {buildQueryDto } from '../common/dto/base-query.dto';
+import { buildQueryDto } from '../common/dto/base-query.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 
 @Injectable()
-export class UsersService  {
+export class UsersService {
   constructor(
     @InjectModel(User.name)
     private readonly userModel: Model<UserDocument>,
@@ -19,7 +23,6 @@ export class UsersService  {
   async findOne(id: string): Promise<UserDocument> {
     const user = await this.userModel.findOne({
       _id: id,
-     
     });
 
     if (!user)
@@ -29,30 +32,26 @@ export class UsersService  {
   }
 
   //  Update User
-  async updateUser(
-    id: string,
-    dto: UpdateUserDto,
-  ): Promise<UserResponseDto> {
-     const user = await this.userModel.findById(id);
+  async updateUser(id: string, dto: UpdateUserDto): Promise<UserResponseDto> {
+    const user = await this.userModel.findById(id);
 
-    if (!user)  throw new NotFoundException(`No active user found with id: ${id}`);
+    if (!user)
+      throw new NotFoundException(`No active user found with id: ${id}`);
     if (dto.email) {
-       const exists = await this.userModel.findOne({
-          email: dto.email,
-          _id: { $ne: id },
-       });
+      const exists = await this.userModel.findOne({
+        email: dto.email,
+        _id: { $ne: id },
+      });
 
-  if (exists) {
-    throw new ConflictException('Email already used');
-  }
-}
+      if (exists) {
+        throw new ConflictException('Email already used');
+      }
+    }
 
-Object.assign(user, dto);
-await user.save();
+    Object.assign(user, dto);
+    await user.save();
 
-return UserResponseDto.fromEntity(user);
-
-  
+    return UserResponseDto.fromEntity(user);
   }
 
   //  Soft Delete
@@ -63,8 +62,7 @@ return UserResponseDto.fromEntity(user);
       { new: true },
     );
 
-    if (!user)
-      throw new NotFoundException(`No user found with id: ${id}`);
+    if (!user) throw new NotFoundException(`No user found with id: ${id}`);
 
     return { message: 'User deactivated successfully' };
   }
@@ -73,35 +71,31 @@ return UserResponseDto.fromEntity(user);
   async hardDelete(id: string): Promise<{ message: string }> {
     const user = await this.userModel.findByIdAndDelete(id);
 
-    if (!user)
-      throw new NotFoundException(`No user found with id: ${id}`);
+    if (!user) throw new NotFoundException(`No user found with id: ${id}`);
 
     return { message: 'User deleted successfully' };
   }
 
-  
+  //  Find All 
 
-  //  Find All (only active users)
+  async findAll(query: buildQueryDto) {
+    const features = new ApiFeatures(
+      this.userModel.find(),
+      query,
+    )
+      .filter()
+      .search(['email', 'fullName']);
 
-async findAll(query: buildQueryDto) {
-  const features = new ApiFeatures(
-    this.userModel.find({ active: true }),
-    query,
-  )
-    .filter()
-    .search(['email', 'fullName']);
+    const total = await features.count();
 
-  const total = await features.count();
+    features.sort().limitFields().paginate(total);
 
-  features.sort().limitFields().paginate(total);
+    const data = await features.exec();
 
-  const data = await features.exec();
-
-  return {
-    results: data.length,
-    pagination: features.paginationResult,
-    data: data.map((user) => UserResponseDto.fromEntity(user)),
-  };
-}
-
+    return {
+      results: data.length,
+      pagination: features.paginationResult,
+      data: data.map((user) => UserResponseDto.fromEntity(user)),
+    };
   }
+}
