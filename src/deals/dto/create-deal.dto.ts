@@ -1,6 +1,7 @@
 import {
   IsEnum,
   IsMongoId,
+  IsNotEmpty,
   IsNumber,
   IsOptional,
   IsString,
@@ -16,6 +17,7 @@ export class CreateDealDto {
     example: 'New Deal',
     description: 'Deal title',
   })
+  @IsNotEmpty()
   @IsString()
   title: string;
 
@@ -23,6 +25,7 @@ export class CreateDealDto {
     example: 500000,
     description: 'Deal value',
   })
+  @IsNotEmpty()
   @IsNumber()
   @Min(0)
   value: number;
@@ -31,6 +34,7 @@ export class CreateDealDto {
     enum: DealStatus,
     example: DealStatus.NEW,
   })
+  @IsNotEmpty()
   @IsEnum(DealStatus)
   @IsOptional()
   status: DealStatus;
@@ -38,6 +42,7 @@ export class CreateDealDto {
   @ApiProperty({
     example: '60d21b4667d0d8992e610c85',
   })
+  @IsNotEmpty()
   @IsMongoId()
   @Exists('Unit')
   unit: string;
@@ -45,14 +50,17 @@ export class CreateDealDto {
   @ApiProperty({
     example: '60d21b4667d0d8992e610c86',
   })
+  @IsNotEmpty()
   @IsMongoId()
   @Exists('User')
   salesAgent: string;
 
-  @ApiProperty({
-    example: 'Client Name',
+ @ApiProperty({
+    example: '60d21b4667d0d8992e610c86',
   })
-  @IsString()
+  @IsNotEmpty()
+  @IsMongoId()
+  @Exists('Client')
   client: string;
 
   @ApiPropertyOptional()

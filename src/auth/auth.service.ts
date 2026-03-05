@@ -14,16 +14,19 @@ import { LoginDto } from './dto/login.dto';
 import { UserResponseDto } from 'src/users/dto/user-response.dto';
 import { generateToken } from 'src/common/utils/generate-token';
 import { JwtService } from '@nestjs/jwt';
+import { UploadService } from 'src/common/storage/upload.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectModel(User.name) private userModel: Model<User>,
       private jwtService: JwtService,
+      private readonly imageService: UploadService,
+
   
   ) {}
 
-  async register(dto: RegisterDto ): Promise<UserResponseDto> {
+  async register(dto: RegisterDto,files: Express.Multer.File[], ): Promise<UserResponseDto> {
     // check if email exists
     const existing = await this.userModel.findOne({ email: dto.email });
 
@@ -31,7 +34,10 @@ export class AuthService {
       throw new UnauthorizedException(
         'Email already in use',
       );
-    const user = await this.userModel.create(dto);
+      const images = files?.length
+    ? await this.imageService.upload(files,['image/jpeg', 'image/png', 'image/webp'],)
+    : [];
+    const user = await this.userModel.create({ ...dto, images });
 
     const token =  generateToken(user.id, this.jwtService);
 

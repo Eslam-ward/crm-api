@@ -1,7 +1,6 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { UserRole } from 'src/common/enums/roles.enum';
-import { User } from '../schema/users.schema';
-import { Types } from 'mongoose';
+import { User, UserDocument } from '../schema/users.schema';
 
 export class UserResponseDto {
   @ApiProperty()
@@ -19,11 +18,19 @@ export class UserResponseDto {
   @ApiProperty()
   phone: string;
 
+   @ApiProperty()
+   isActive: boolean;
+
   @ApiPropertyOptional()
   accessToken?: string;
+  @ApiProperty()
+  createdAt: Date;
+
+  @ApiProperty({ type: [String], default: [] })
+  images: string[];
 
   static fromEntity(
-    user: User & { _id: Types.ObjectId },
+    user:UserDocument,
     accessToken?: string,
   ): UserResponseDto {
     const dto = new UserResponseDto();
@@ -32,6 +39,10 @@ export class UserResponseDto {
     dto.email = user.email;
     dto.fullName = user.fullName;
     dto.phone = user.phone;
+    dto.isActive = user.isActive;
+    dto.createdAt = user.createdAt;
+    dto.images = user.images || [];
+    
     dto.role = user.role;
 
     if (accessToken) dto.accessToken = accessToken;

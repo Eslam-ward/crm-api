@@ -3,6 +3,7 @@ import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { User, UserSchema } from './schema/users.schema';
 import { MongooseModule } from '@nestjs/mongoose';
+import { UploadService } from 'src/common/storage/upload.service';
 
 @Module({
   imports: [
@@ -11,6 +12,6 @@ import { MongooseModule } from '@nestjs/mongoose';
     ]),
   ],
   controllers: [UsersController],
-  providers: [UsersService]
+  providers: [UsersService,UploadService]
 })
 export class UserModule {}

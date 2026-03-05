@@ -11,16 +11,18 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { ApiFeatures } from 'src/common/utils/api-features';
 import { buildQueryDto } from '../common/dto/base-query.dto';
 import { UserResponseDto } from './dto/user-response.dto';
+import { UploadService } from 'src/common/storage/upload.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name)
     private readonly userModel: Model<UserDocument>,
+     private readonly imageService: UploadService,
   ) {}
 
   //  Find One (only active users)
-  async findOne(id: string): Promise<UserDocument> {
+  async findOne(id: string): Promise<UserResponseDto> {
     const user = await this.userModel.findOne({
       _id: id,
     });
@@ -28,11 +30,11 @@ export class UsersService {
     if (!user)
       throw new NotFoundException(`No active user found with id: ${id}`);
 
-    return user;
+    return UserResponseDto.fromEntity(user);
   }
 
   //  Update User
-  async updateUser(id: string, dto: UpdateUserDto): Promise<UserResponseDto> {
+  async updateUser(id: string, dto: UpdateUserDto,files?: Express.Multer.File[],): Promise<UserResponseDto> {
     const user = await this.userModel.findById(id);
 
     if (!user)
@@ -46,6 +48,12 @@ export class UsersService {
       if (exists) {
         throw new ConflictException('Email already used');
       }
+    }
+    if (files?.length) {
+      user.images = await this.imageService.replace(
+        user.images,
+        files,
+      );
     }
 
     Object.assign(user, dto);
@@ -69,11 +77,16 @@ export class UsersService {
 
   //  Hard Delete
   async hardDelete(id: string): Promise<{ message: string }> {
-    const user = await this.userModel.findByIdAndDelete(id);
+     const user = await this.userModel.findById(id);
 
-    if (!user) throw new NotFoundException(`No user found with id: ${id}`);
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
 
-    return { message: 'User deleted successfully' };
+    await this.imageService.deleteImages(user.images);
+ 
+    await user.deleteOne();
+    return { message: 'User deleted permanently' };
   }
 
   //  Find All 

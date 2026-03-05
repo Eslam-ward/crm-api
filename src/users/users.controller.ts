@@ -7,6 +7,8 @@ import {
   Body,
   Query,
   UseGuards,
+  UseInterceptors,
+  UploadedFiles,
 } from '@nestjs/common';
 import {
   
@@ -24,6 +26,7 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
+import { FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -48,11 +51,13 @@ export class UsersController {
   @ApiParam({ name: 'id', description: 'User ID' })
   @ApiOkResponse({ type: UserResponseDto })
   @Put(':id')
+  @UseInterceptors(FilesInterceptor('images', 5))
   async update(
     @Param('id', ParseObjectIdPipe) id: string,
     @Body() dto: UpdateUserDto,
+    @UploadedFiles() files?: Express.Multer.File[],
   ): Promise<UserResponseDto> {
-    return this.usersService.updateUser(id, dto);
+    return this.usersService.updateUser(id, dto, files);
   }
 // Soft Delete - Admin Only
   @ApiOperation({ summary: 'Deactivate user' })

@@ -145,38 +145,6 @@ export class DealsService {
     }
 
 
-// async getPipelineSummary() {
-//   const result = await this.dealModel.aggregate([
-//     {
-//       $group: {
-//         _id: '$status',
-//         count: { $sum: 1 },
-//         totalValue: { $sum: '$value' },
-//       },
-//     },
-//   ]);
-
-//   const statuses = [
-//     'NEW',
-//     'NEGOTIATION',
-//     'RESERVATION',
-//     'CLOSED_WON',
-//     'CLOSED_LOST',
-//   ];
-
-//   const summary = {};
-
-//   statuses.forEach((status) => {
-//     const found = result.find((r) => r._id === status);
-
-//     summary[status] = {
-//       count: found?.count || 0,
-//       totalValue: found?.totalValue || 0,
-//     };
-//   });
-
-//   return summary;
-// }
 
 
 async getPipelineSummary() {

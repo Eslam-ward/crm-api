@@ -9,6 +9,7 @@ import { User, UserSchema } from '../users/schema/users.schema';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from 'src/common/strategies/jwt.strategy';
+import { UploadService } from 'src/common/storage/upload.service';
 
 @Module({
   imports: [
@@ -33,7 +34,7 @@ import { JwtStrategy } from 'src/common/strategies/jwt.strategy';
 
   controllers: [AuthController],
 
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy,UploadService],
 
   exports: [AuthService, JwtModule],
 })

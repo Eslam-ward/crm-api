@@ -45,8 +45,14 @@ export class Deal {
    
   })
   salesAgent: Types.ObjectId;
- @Prop({ trim: true, required: true })
-  client: string
+  
+  @Prop({
+    type: Types.ObjectId,
+    ref: 'Client',
+    required: true,
+   
+  })
+  client: Types.ObjectId;
 
   @Prop({ trim: true })
   notes: string;

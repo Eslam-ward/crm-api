@@ -46,6 +46,11 @@ export class User {
 
  @Prop({ select: false })
   refreshToken?: string;
+  @Prop({ default: Date.now })
+  createdAt: Date;
+
+  @Prop({ type: [String], default: [] })
+  images: string[];
 
 }
 

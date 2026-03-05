@@ -4,6 +4,8 @@ import {
   Body,
   UseGuards,
   Param,
+  UseInterceptors,
+  UploadedFiles,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -19,6 +21,7 @@ import { AuthService } from './auth.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { FilesInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -28,8 +31,9 @@ export class AuthController {
   @ApiOperation({ summary: 'Register new user' })
   @ApiCreatedResponse({ description: 'User registered successfully' })
   @Post('register')
-  signup(@Body() dto: RegisterDto) {
-    return this.authService.register(dto);
+  @UseInterceptors(FilesInterceptor('images',5))
+  signup(@Body() dto: RegisterDto,@UploadedFiles() files: Express.Multer.File[]) {
+    return this.authService.register(dto, files);
   }
 
   @ApiOperation({ summary: 'User login' })
