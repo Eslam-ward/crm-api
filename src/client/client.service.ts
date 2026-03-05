@@ -82,7 +82,7 @@ export class ClientService {
   return { message: 'Client deleted successfully' };
 }
 
-  // 🔥 Dashboard Analytics
+  //  Dashboard Analytics
   async getDashboardStats() {
     const totalClients = await this.clientModel.countDocuments();
 
@@ -103,7 +103,7 @@ export class ClientService {
     };
   }
 
-  // 🔥 Client Detailed Analytics
+  //  Client Detailed Analytics
   async getClientAnalytics(clientId: string) {
     return this.dealModel.aggregate([
       { $match: { client: new Types.ObjectId(clientId) } },

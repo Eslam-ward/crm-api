@@ -12,6 +12,7 @@ import { StorageModule } from './common/storage/storage.module';
 import { UnitsModule } from './units/units.module';
 import { DealsModule } from './deals/deals.module';
 import { ClientModule } from './client/client.module';
+import { LeadModule } from './lead/lead.module';
 
 
 @Module({
@@ -40,7 +41,8 @@ import { ClientModule } from './client/client.module';
     StorageModule,
     UnitsModule,
     DealsModule,
-    ClientModule
+    ClientModule,
+    LeadModule
  
   ],
 })
