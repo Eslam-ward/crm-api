@@ -46,6 +46,8 @@ export class UnitsService {
 
     const unit = await this.unitModel.create({
       ...createUnitDto,
+        area: new Types.ObjectId(createUnitDto.area),
+       project: new Types.ObjectId(createUnitDto.project),
       images,
     });
 

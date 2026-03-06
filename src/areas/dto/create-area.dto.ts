@@ -1,0 +1,77 @@
+import {
+  IsString,
+  IsNotEmpty,
+  IsMongoId,
+  IsEnum,
+  IsOptional,
+  IsBoolean,
+  MaxLength,
+} from 'class-validator';
+
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { AreaType } from '../enums/area-type.enum';
+import { Exists } from 'src/common/validators/id-exists.validator';
+
+export class CreateAreaDto {
+
+  @ApiProperty({
+    example: 'B1',
+    description: 'Area name',
+  })
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(100)
+  name: string;
+
+
+  @ApiProperty({
+    example: '60d21b4667d0d8992e610c85',
+    description: 'Project ID',
+  })
+  @IsMongoId()
+  @IsNotEmpty()
+  @Exists('Project')
+  project: string;
+
+
+  @ApiProperty({
+    enum: AreaType,
+    example: AreaType.RESIDENTIAL,
+  })
+  @IsEnum(AreaType)
+  type: AreaType;
+
+
+  @ApiProperty({
+    example: 'A',
+    description: 'Group name',
+  })
+  @IsString()
+  @IsNotEmpty()
+  group: string;
+
+
+  @ApiPropertyOptional({
+    example: 'This area is located near main road',
+  })
+  @IsString()
+  @IsOptional()
+  description?: string;
+
+
+  @ApiProperty({
+    example: 'New Cairo - District 5',
+  })
+  @IsString()
+  @IsNotEmpty()
+  location: string;
+
+
+  @ApiPropertyOptional({
+    example: true,
+    description: 'Is area active',
+  })
+  @IsBoolean()
+  @IsOptional()
+  isActive?: boolean;
+}

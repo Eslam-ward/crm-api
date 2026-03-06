@@ -21,8 +21,9 @@ export class CreateUnitDto {
     example: '65a1b2c3d4e5f6',
     description: 'Project ID',
   })
-  @IsNotEmpty()
   @IsMongoId()
+  @IsNotEmpty()
+
   @Exists('Project')
   project: string;
 
@@ -60,10 +61,12 @@ export class CreateUnitDto {
   price: number;
 
   @ApiProperty({
-    example: '120 sqm',
+    example: 'B1',
   })
+  @IsMongoId()
   @IsNotEmpty()
-  @IsString()
+
+  @Exists('Area')
   area: string;
 
   @ApiPropertyOptional({
@@ -111,7 +114,7 @@ export class CreateUnitDto {
   bathrooms: number;
 
   @ApiProperty({
-    example: 90,
+    example: '90 M',
   })
   @Type(() => Number)
   @IsNumber()

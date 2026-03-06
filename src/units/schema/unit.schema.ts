@@ -33,8 +33,13 @@ export class Unit {
   @Prop({ required: true, min: 0 })
   price: number;
 
-  @Prop({ required: true })
-  area: string;
+@Prop({
+  type: Types.ObjectId,
+  ref: 'Area',
+  required: true,
+  index: true,
+})
+area: Types.ObjectId;
 
   @Prop({ min: 0 })
   floor: number;
