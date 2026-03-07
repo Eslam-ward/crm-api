@@ -29,7 +29,7 @@ export class ClientService {
 
   async findAll(query:buildQueryDto) {
       const features = new ApiFeatures(
-         this.dealModel.find().lean(),
+         this.clientModel.find().lean(),
          query,
        )
          .filter()
