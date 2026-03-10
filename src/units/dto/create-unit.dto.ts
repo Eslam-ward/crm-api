@@ -8,9 +8,7 @@ import {
   Min,
   IsMongoId,
   MaxLength,
-    ArrayNotEmpty,
-  ArrayUnique,
-  IsArray
+
 } from 'class-validator';
 import { Type } from 'class-transformer';
 
