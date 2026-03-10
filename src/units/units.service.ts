@@ -36,13 +36,10 @@ export class UnitsService {
     }
 
     // 1 Upload images
-    const images = files.length
-      ? await this.uploadService.upload(files, [
-          'image/jpeg',
-          'image/png',
-          'image/webp',
-        ])
-      : [];
+    const images = await this.uploadService.upload(files)
+      
+    
+     
 
     const unit = await this.unitModel.create({
       ...createUnitDto,

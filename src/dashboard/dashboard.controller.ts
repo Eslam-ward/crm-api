@@ -2,22 +2,27 @@ import { Controller, Get, UseGuards } from '@nestjs/common';
 import { DashboardService } from './dashboard.service';
 import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
-import { UserRole } from '../common/enums/roles.enum';
+import { UserRole } from '../users/enums/roles.enum';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
-import {IDashboardResponse} from './interfaces/dashboardResponse.interface'
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { IDashboardResponse } from './interfaces/dashboardResponse.interface';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 
 @ApiTags('Dashboard')
-@ApiBearerAuth() 
+@ApiBearerAuth()
 @Controller('dashboard')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
 export class DashboardController {
   constructor(private readonly dashboardService: DashboardService) {}
 
-   @Get()
+  @Get()
   @ApiOperation({ summary: 'Get full dashboard overview' })
-  @ApiResponse({ status: 200, description: 'Dashboard data'})
+  @ApiResponse({ status: 200, description: 'Dashboard data' })
   async getDashboard(): Promise<IDashboardResponse> {
     return this.dashboardService.getDashboard();
   }
@@ -31,7 +36,7 @@ export class DashboardController {
 
   @Get('sales-overview')
   @ApiOperation({ summary: 'Get last 6 months sales overview' })
-  @ApiResponse({ status: 200, description: 'Sales overview'})
+  @ApiResponse({ status: 200, description: 'Sales overview' })
   async getSalesOverview() {
     return this.dashboardService.getSalesOverview();
   }
@@ -52,7 +57,11 @@ export class DashboardController {
 
   @Get('recent-activity')
   @ApiOperation({ summary: 'Get recent activities' })
-  @ApiResponse({ status: 200, description: 'Recent activity data', type: [Object] })
+  @ApiResponse({
+    status: 200,
+    description: 'Recent activity data',
+    type: [Object],
+  })
   async getRecentActivity() {
     return this.dashboardService.getRecentActivity();
   }

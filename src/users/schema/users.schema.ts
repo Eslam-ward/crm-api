@@ -1,11 +1,9 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Types } from 'mongoose';
 import * as bcrypt from 'bcrypt';
-import { UserRole } from 'src/common/enums/roles.enum';
-
+import { UserRole } from 'src/users/enums/roles.enum';
 
 export type UserDocument = HydratedDocument<User>;
-
 
 @Schema({ timestamps: true })
 export class User {
@@ -15,15 +13,13 @@ export class User {
   @Prop({ required: true, unique: true, lowercase: true, trim: true })
   email: string;
 
-
   @Prop({ required: true, minlength: 6, select: false })
   password: string;
-  
 
   @Prop({ required: true, trim: true })
   phone: string;
 
-  @Prop({ type: String, enum: UserRole, default: UserRole.USER })
+  @Prop({ type: String, enum: UserRole, default: UserRole.CUSTOMER })
   role: UserRole;
 
   @Prop({ default: true })
@@ -41,16 +37,13 @@ export class User {
   @Prop({ default: false })
   passwordResetVerified?: boolean;
 
-
-
- @Prop({ select: false })
+  @Prop({ select: false })
   refreshToken?: string;
   @Prop({ default: Date.now })
   createdAt: Date;
 
   @Prop({ type: [String], default: [] })
   images: string[];
-
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
@@ -64,5 +57,3 @@ UserSchema.pre<UserDocument>('save', async function () {
     this.passwordChangedAt = new Date();
   }
 });
-
-

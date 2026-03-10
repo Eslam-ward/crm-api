@@ -1,7 +1,9 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -12,14 +14,38 @@ import { ApiFeatures } from 'src/common/utils/api-features';
 import { buildQueryDto } from '../common/dto/base-query.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 import { UploadService } from 'src/common/storage/upload.service';
+import { CreateUserDto } from './dto/create-user.dto';
+import { generateToken } from 'src/common/utils/generate-token';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name)
     private readonly userModel: Model<UserDocument>,
-     private readonly imageService: UploadService,
+    private readonly imageService: UploadService,
+    private jwtService: JwtService,
   ) {}
+
+  async create(
+    dto: CreateUserDto,
+    files: Express.Multer.File[],
+  ): Promise<UserResponseDto> {
+    // check if email exists
+    const existing = await this.userModel.findOne({ email: dto.email });
+
+    if (existing) throw new UnauthorizedException('Email already in use');
+    if (!files?.length) {
+      throw new BadRequestException(' image is required');
+    }
+    const images = await this.imageService.upload(files);
+
+    const user = await this.userModel.create({ ...dto, images });
+
+    const token = generateToken(user.id, this.jwtService);
+
+    return UserResponseDto.fromEntity(user, token);
+  }
 
   //  Find One (only active users)
   async findOne(id: string): Promise<UserResponseDto> {
@@ -34,7 +60,11 @@ export class UsersService {
   }
 
   //  Update User
-  async updateUser(id: string, dto: UpdateUserDto,files?: Express.Multer.File[],): Promise<UserResponseDto> {
+  async updateUser(
+    id: string,
+    dto: UpdateUserDto,
+    files?: Express.Multer.File[],
+  ): Promise<UserResponseDto> {
     const user = await this.userModel.findById(id);
 
     if (!user)
@@ -50,10 +80,7 @@ export class UsersService {
       }
     }
     if (files?.length) {
-      user.images = await this.imageService.replace(
-        user.images,
-        files,
-      );
+      user.images = await this.imageService.replace(user.images, files);
     }
 
     Object.assign(user, dto);
@@ -77,25 +104,22 @@ export class UsersService {
 
   //  Hard Delete
   async hardDelete(id: string): Promise<{ message: string }> {
-     const user = await this.userModel.findById(id);
+    const user = await this.userModel.findById(id);
 
     if (!user) {
       throw new NotFoundException('User not found');
     }
 
     await this.imageService.deleteImages(user.images);
- 
+
     await user.deleteOne();
     return { message: 'User deleted permanently' };
   }
 
-  //  Find All 
+  //  Find All
 
   async findAll(query: buildQueryDto) {
-    const features = new ApiFeatures(
-      this.userModel.find(),
-      query,
-    )
+    const features = new ApiFeatures(this.userModel.find(), query)
       .filter()
       .search(['email', 'fullName']);
 

@@ -31,9 +31,8 @@ async create(
 ): Promise<Project> {
 
  
-  const images = files?.length
-    ? await this.imageService.upload(files,['image/jpeg', 'image/png', 'image/webp'],)
-    : [];
+  const images =await this.imageService.upload(files)
+
 
  
   const project = await this.projectModel.create({

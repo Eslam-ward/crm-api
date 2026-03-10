@@ -35,7 +35,7 @@ export class AuthService {
         'Email already in use',
       );
       const images = files?.length
-    ? await this.imageService.upload(files,['image/jpeg', 'image/png', 'image/webp'],)
+    ? await this.imageService.upload(files)
     : [];
     const user = await this.userModel.create({ ...dto, images });
 

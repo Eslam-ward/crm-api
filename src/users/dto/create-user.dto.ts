@@ -1,14 +1,17 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import {
   IsEmail,
+  IsEnum,
   IsNotEmpty,
+  IsOptional,
   IsString,
   Matches,
   MinLength,
 } from 'class-validator';
+import { UserRole } from 'src/users/enums/roles.enum';
 import { IsPhoneNumberEGorSA } from 'src/common/validators/is-phone.validator';
 
-export class RegisterDto {
+export class CreateUserDto {
   @ApiProperty({
     example: 'Ahmed Mohamed',
     minLength: 6,
@@ -31,7 +34,7 @@ export class RegisterDto {
   })
   @IsNotEmpty()
   @MinLength(8)
-    @Matches(
+  @Matches(
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#^()[\]{}\-_=+|:;"'<>,./~`]).+$/,
     {
       message:
@@ -40,8 +43,13 @@ export class RegisterDto {
   )
   password: string;
 
-
-
+  @ApiPropertyOptional({
+    enum: UserRole,
+    example: UserRole.CUSTOMER,
+  })
+  @IsOptional()
+  @IsEnum(UserRole)
+  role: UserRole;
 
   @ApiProperty({
     example: '+201001234567',
@@ -53,4 +61,8 @@ export class RegisterDto {
     message: 'Phone number must be valid Egyptian or Saudi number',
   })
   phone: string;
+
+
+      
+    
 }

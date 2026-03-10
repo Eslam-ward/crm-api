@@ -2,22 +2,22 @@ import {
   Controller,
   Get,
   Param,
-  Put,
+  Post,
   Delete,
   Body,
   Query,
   UseGuards,
   UseInterceptors,
   UploadedFiles,
+  Patch,
 } from '@nestjs/common';
 import {
-  
   ApiOperation,
   ApiOkResponse,
-  
   ApiParam,
   ApiBearerAuth,
   ApiTags,
+  ApiCreatedResponse
 } from '@nestjs/swagger';
 
 import { UsersService } from './users.service';
@@ -29,6 +29,7 @@ import { RolesGuard } from 'src/common/guards/roles.guard';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { CreateUserDto } from './dto/create-user.dto';
 @ApiTags('Users')
 @ApiBearerAuth()
 @Controller('users')
@@ -36,6 +37,17 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 @Roles('super_admin', 'admin')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+
+    @ApiOperation({ summary: 'create new user' })
+    @ApiCreatedResponse({ description: 'User created successfully' })
+    @Post('create')
+    @UseInterceptors(FilesInterceptor('images',5))
+    create(@Body() dto:CreateUserDto,@UploadedFiles() files: Express.Multer.File[]) {
+      return this.usersService.create(dto, files);
+    }
+
+
 
   @Get()
   async findAll(@Query() query: buildQueryDto) {
@@ -53,8 +65,9 @@ export class UsersController {
   @ApiOperation({ summary: 'Update user' })
   @ApiParam({ name: 'id', description: 'User ID' })
   @ApiOkResponse({ type: UserResponseDto })
-  @Put(':id')
+  
   @UseInterceptors(FilesInterceptor('images', 5))
+  @Patch(':id')
   async update(
     @Param('id', ParseObjectIdPipe) id: string,
     @Body() dto: UpdateUserDto,

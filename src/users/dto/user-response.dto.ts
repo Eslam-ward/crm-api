@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { UserRole } from 'src/common/enums/roles.enum';
+import { UserRole } from 'src/users/enums/roles.enum';
 import { User, UserDocument } from '../schema/users.schema';
 
 export class UserResponseDto {

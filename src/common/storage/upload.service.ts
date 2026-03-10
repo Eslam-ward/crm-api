@@ -1,15 +1,12 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { StorageService } from './storage.service';
-
+import { ALLOWED_IMAGE_TYPES } from './constants/allowed-file-types.constant';
 
 @Injectable()
 export class UploadService {
   constructor(private readonly storageService: StorageService) {}
 
-  async upload(
-    files: Express.Multer.File[],
-    allowedTypes: string[],
-  ): Promise<string[]> {
+  async upload(files: Express.Multer.File[]): Promise<string[]> {
 
     if (!files?.length) {
       throw new BadRequestException('At least one image is required');
@@ -18,22 +15,20 @@ export class UploadService {
     return this.storageService.uploadMultiple(
       files,
       'locations',
-      
-      { allowedTypes },
+      { allowedTypes: ALLOWED_IMAGE_TYPES },
     );
   }
 
   async replace(
     oldImages: string[],
     newFiles?: Express.Multer.File[],
-    allowedTypes?: string[],
   ): Promise<string[]> {
 
     if (!newFiles?.length) return oldImages;
 
     await this.deleteImages(oldImages);
 
-    return this.upload(newFiles, allowedTypes ?? []);
+    return this.upload(newFiles);
   }
 
   async deleteImages(imageUrls: string[]) {
