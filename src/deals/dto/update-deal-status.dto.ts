@@ -1,6 +1,6 @@
 import { IsEnum } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
-import { DealStatus } from '../schema/deal.schema';
+import { DealStatus } from '../enums/deal-status.enums';
 
 export class UpdateDealStatusDto {
   @ApiProperty({

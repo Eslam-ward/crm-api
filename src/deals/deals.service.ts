@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Deal, DealDocument, DealStatus } from './schema/deal.schema';
+import { Deal, DealDocument} from './schema/deal.schema';
 import { Unit, UnitDocument } from '../units/schema/unit.schema';
 import { UnitStatus } from '../units/enums/unit-status.enum';
 
@@ -15,6 +15,7 @@ import { buildQueryDto } from 'src/common/dto/base-query.dto';
 import { ApiFeatures } from 'src/common/utils/api-features';
 import { UpdateDealDto } from './dto/update-deal.dto';
 import { formatMoneyValue } from 'src/common/helpers/money-format.helper';
+import { DealStatus } from './enums/deal-status.enums';
 
 @Injectable()
 export class DealsService {

@@ -2,10 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { Unit, UnitDocument } from '../units/schema/unit.schema';
-import { Deal, DealDocument, DealStatus } from '../deals/schema/deal.schema';
+import { Deal, DealDocument } from '../deals/schema/deal.schema';
 import { UnitStatus } from '../units/enums/unit-status.enum';
 import { Lead, LeadDocument } from 'src/lead/schema/lead.schema';
 import { IMonthData } from './interfaces/month-data.interface';
+import { DealStatus } from 'src/deals/enums/deal-status.enums';
 
 
 @Injectable()

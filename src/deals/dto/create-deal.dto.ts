@@ -9,8 +9,10 @@ import {
 } from 'class-validator';
 
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { DealStatus } from '../schema/deal.schema';
 import { Exists } from 'src/common/validators/id-exists.validator';
+import { DealStatus } from '../enums/deal-status.enums';
+import { Type } from 'class-transformer';
+import { PaymentType } from '../enums/payment-type.enums';
 
 export class CreateDealDto {
   @ApiProperty({
@@ -62,6 +64,48 @@ export class CreateDealDto {
   @IsMongoId()
   @Exists('Client')
   client: string;
+
+    
+  @ApiProperty({
+    description: 'Payment type',
+    enum: PaymentType,
+    example: PaymentType.CASH,
+  })
+  @IsEnum(PaymentType)
+  paymentType: PaymentType;
+
+  @ApiProperty({
+    description: 'Paid amount in EGP',
+    example: 50,
+    minimum: 0,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(0)
+  paidAmount: number;
+
+  @ApiProperty({
+    description: 'Remaining amount in EGP',
+    example: 150,
+    minimum: 0,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(0)
+  remainingAmount: number;
+
+    @ApiProperty({
+    description: 'Required Amount in EGP',
+    example: 1500000,
+    minimum: 0,
+  })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(0)
+  requiredAmount:number
 
   @ApiPropertyOptional()
   @IsString()
