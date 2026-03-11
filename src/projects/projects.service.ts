@@ -120,9 +120,27 @@ async findAll(query: buildQueryDto) {
 
 // }
 
+// @desc get all units that belong to specific project
 
+async getProjectUnits(projectId: string, query: buildQueryDto) {
+  const features = new ApiFeatures(
+    this.unitModel.find({ project: projectId }),
+    query,
+  )
+    .filter()
+    .search(['unitCode', 'phase', 'type'])
+    .sort()
+    .limitFields();
 
+  const total = await features.count();
+  features.paginate(total);
 
+  return {
+    results: total,
+    pagination: features.paginationResult,
+    data: await features.exec(),
+  };
+}
 
 
 async getDashboardSummary() {

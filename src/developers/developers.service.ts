@@ -57,6 +57,30 @@ async findAll(query: buildQueryDto) {
   };
 }
 
+
+// @desc get all project that belong to specific developer
+
+async getDeveloperProjects(developerId: string, query: buildQueryDto) {
+  const features = new ApiFeatures(
+    this.projectModel.find({ developer: developerId }),
+    query,
+  )
+    .filter()
+    .search(['name', 'description', 'location'])
+    .sort()
+    .limitFields();
+
+  const total = await features.count();
+  features.paginate(total);
+
+  return {
+    results: total,
+    pagination: features.paginationResult,
+    data: await features.exec(),
+  };
+}
+
+
   async findOne(id: string) {
     const developer = await this.developerModel.findById({_id: id,});
     if (!developer) {

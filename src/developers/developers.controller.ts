@@ -57,6 +57,16 @@ export class DevelopersController {
     return this.developersService.getoneDeveloperDashboardSummary(id);
   }
 
+    @ApiOperation({ summary: 'Get all projects that belong to specific developer' })
+    @ApiOkResponse({ description: 'Return all projects' })
+    @Get(':developerId/allProjects')
+    getProjectUnits(
+    @Param('developerId') developerId: string,
+    @Query() query: buildQueryDto,
+  ) {
+    return this.developersService.getDeveloperProjects(developerId, query);
+  }
+
   @ApiOperation({ summary: 'Get developer by id' })
   @ApiParam({ name: 'id', description: 'Developer ID' })
   @ApiOkResponse({ description: 'Return developer data' })

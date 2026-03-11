@@ -62,6 +62,7 @@ export class ProjectsController {
   findAll(@Query() query: buildQueryDto) {
     return this.projectsService.findAll(query);
   }
+  
 
   @ApiOperation({ summary: 'Get dashboard statistics' })
   @ApiOkResponse({ description: 'Return dashboard stats' })
@@ -69,7 +70,15 @@ export class ProjectsController {
   getStats() {
     return this.projectsService.getDashboardSummary();
   }
-
+  @ApiOperation({ summary: 'Get all units that belong to specific project' })
+  @ApiOkResponse({ description: 'Return all units' })
+  @Get(':projectId/units')
+  getProjectUnits(
+  @Param('projectId') projectId: string,
+  @Query() query: buildQueryDto,
+) {
+  return this.projectsService.getProjectUnits(projectId, query);
+}
   @ApiOperation({ summary: 'Get project summary stats' })
   @ApiParam({ name: 'id', description: 'Project ID' })
   @ApiOkResponse({ description: 'Return project summary stats' })
