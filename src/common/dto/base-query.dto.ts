@@ -1,6 +1,7 @@
 import { IsOptional, IsString, IsNumberString, IsIn } from 'class-validator';
 
-export class buildQueryDto{
+export class buildQueryDto {
+
   @IsOptional()
   @IsString()
   keyword?: string;
@@ -21,5 +22,194 @@ export class buildQueryDto{
   @IsString()
   fields?: string;
 
- 
+
+  @IsOptional()
+  @IsString()
+  status?: string; // Deal | Project | Lead | Unit
+
+  @IsOptional()
+  @IsString()
+  type?: string; // Transaction | Unit | Event | Area
+
+  @IsOptional()
+  @IsString()
+  source?: string; // Transaction | Lead
+
+  @IsOptional()
+  @IsString()
+  notes?: string;
+
+
+  @IsOptional()
+  @IsString()
+  fullName?: string;
+
+  @IsOptional()
+  @IsString()
+  email?: string;
+
+  @IsOptional()
+  @IsString()
+  phone?: string;
+
+  @IsOptional()
+  @IsString()
+  role?: string;
+
+  @IsOptional()
+  @IsString()
+  isActive?: string;
+
+  @IsOptional()
+  @IsString()
+  location?: string;
+
+  @IsOptional()
+  @IsString()
+  city?: string;
+
+  @IsOptional()
+  @IsString()
+  country?: string;
+
+
+  @IsOptional()
+  @IsString()
+  name?: string;
+
+  @IsOptional()
+  @IsString()
+  group?: string;
+
+
+  @IsOptional()
+  @IsString()
+  area?: string;
+
+  @IsOptional()
+  @IsString()
+  'startDate[gte]'?: string;
+
+  @IsOptional()
+  @IsString()
+  'startDate[lte]'?: string;
+
+
+  @IsOptional()
+  @IsString()
+  title?: string;
+
+  @IsOptional()
+  @IsString()
+  paymentType?: string;
+
+  @IsOptional()
+  @IsNumberString()
+  'value[gte]'?: string;
+
+  @IsOptional()
+  @IsNumberString()
+  'value[lte]'?: string;
+
+  @IsOptional()
+  @IsNumberString()
+  'paidAmount[gte]'?: string;
+
+  @IsOptional()
+  @IsNumberString()
+  'paidAmount[lte]'?: string;
+
+  @IsOptional()
+  @IsString()
+  category?: string;
+
+  @IsOptional()
+  @IsNumberString()
+  'amount[gte]'?: string;
+
+  @IsOptional()
+  @IsNumberString()
+  'amount[lte]'?: string;
+
+  @IsOptional()
+  @IsString()
+  'date[gte]'?: string;
+
+  @IsOptional()
+  @IsString()
+  'date[lte]'?: string;
+
+
+  @IsOptional()
+  @IsString()
+  unitCode?: string;
+
+  @IsOptional()
+  @IsString()
+  purpose?: string;
+
+  @IsOptional()
+  @IsString()
+  phase?: string;
+
+  @IsOptional()
+  @IsNumberString()
+  bedrooms?: string;
+
+  @IsOptional()
+  @IsNumberString()
+  bathrooms?: string;
+
+  @IsOptional()
+  @IsNumberString()
+  floor?: string;
+
+  @IsOptional()
+  @IsNumberString()
+  'price[gte]'?: string;
+
+  @IsOptional()
+  @IsNumberString()
+  'price[lte]'?: string;
+
+  @IsOptional()
+  @IsNumberString()
+  'size[gte]'?: string;
+
+  @IsOptional()
+  @IsNumberString()
+  'size[lte]'?: string;
+
+  
+  @IsOptional()
+  @IsString()
+  project?: string;
+
+  @IsOptional()
+  @IsString()
+  developer?: string;
+
+  @IsOptional()
+  @IsString()
+  unit?: string;
+
+  @IsOptional()
+  @IsString()
+  client?: string;
+
+  @IsOptional()
+  @IsString()
+  salesAgent?: string;
+
+  @IsOptional()
+  @IsString()
+  assignedTo?: string;
+
+  @IsOptional()
+  @IsString()
+  linkedDeal?: string;
+
+  @IsOptional()
+  @IsString()
+  createdBy?: string;
 }

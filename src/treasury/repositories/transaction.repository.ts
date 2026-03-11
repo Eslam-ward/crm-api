@@ -82,7 +82,7 @@ export class TransactionRepository {
     return result ?? { totalIncome: 0, totalExpenses: 0, netBalance: 0 };
   }
 
-   async update(
+  async update(
     transactionId: string,
     data: Partial<Transaction>,
     session?: ClientSession,
@@ -125,22 +125,35 @@ export class TransactionRepository {
     return transaction;
   }
 
+  async findDuplicate(dto: any, session?: ClientSession) {
+    return this.transactionModel
+      .findOne(
+        {
+          type: dto.type,
+          amount: dto.amount,
+          category: dto.category,
+          source: dto.source,
+          date: dto.date,
+        },
+        null,
+        { session },
+      )
+      .lean();
+  }
 
-  async findDuplicate(
-  dto: any,
-  session?: ClientSession,
-) {
-  return this.transactionModel.findOne(
-    {
-      type: dto.type,
-      amount: dto.amount,
-      category: dto.category,
-      source: dto.source,
-      date: dto.date, 
-      
-    },
-    null,
-    { session },
-  ).lean();
-}
+  async findForExport(query: buildQueryDto) {
+    return new ApiFeatures(
+      this.transactionModel
+        .find()
+        .populate('linkedDeal', 'title -_id')
+        .populate('salesAgent', 'fullName -_id')
+        .populate('createdBy', 'fullName role -_id'),
+      query,
+    )
+      .filter()
+      .search(['type', 'source', 'salesAgent', 'category'])
+      .sort()
+      .limitFields()
+      .exec();
+  }
 }

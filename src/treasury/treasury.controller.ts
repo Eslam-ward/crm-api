@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, UseGuards, Query, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, UseGuards, Query, Patch, Param, Delete, Res } from '@nestjs/common';
 import { TreasuryService } from './treasury.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
@@ -11,6 +11,7 @@ import { buildQueryDto } from 'src/common/dto/base-query.dto';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { ApiTags, ApiOperation, ApiBearerAuth, ApiParam, ApiQuery, ApiResponse } from '@nestjs/swagger';
 import { Transaction } from './schemas/transaction.schema';
+import type { Response } from 'express';
 
 @ApiTags('Treasury Transactions')
 @ApiBearerAuth()
@@ -42,6 +43,23 @@ export class TreasuryController {
   @ApiOperation({ summary: 'Get treasury stats (income, expense, net balance)' })
   getStats() {
     return this.treasuryService.getStats();
+  }
+
+  @Get('export')
+  @ApiOperation({ summary: 'Export transactions to Excel' })
+  async exportTransactions(@Res() res: Response,@Query() query: buildQueryDto) {
+    const buffer = await this.treasuryService.exportTransactionsExcel(query);
+
+    res.setHeader(
+      'Content-Type',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    );
+    res.setHeader(
+      'Content-Disposition',
+      'attachment; filename="transactions.xlsx"',
+    );
+
+    res.end(buffer);
   }
 
   @Get(':id')

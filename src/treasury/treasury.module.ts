@@ -7,6 +7,7 @@ import { TreasuryService } from './treasury.service';
 import { TreasuryController } from './treasury.controller';
 
 import { TransactionRepository } from './repositories/transaction.repository';
+import { TreasuryExportService } from './export/treasury-export.service';
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { TransactionRepository } from './repositories/transaction.repository';
   providers: [
     TreasuryService,
     TransactionRepository,
+    TreasuryExportService
   ],
 })
 export class TreasuryModule {}

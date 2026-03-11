@@ -10,14 +10,14 @@ export default () => ({
     uri: process.env.MONGO_URI,
   },
 
-  jwt: {
+   jwt: {
     secret: process.env.JWT_SECRET_KEY,
     expiresIn: process.env.JWT_EXPIRE_TIME,
   },
 
   refreshToken: {
     secret: process.env.JWT_REFRESH_SECRET_KEY,
-    expiresIn: process.env.JWT_REFRESH_EXPIRE_TIME, 
+    expiresIn: process.env.JWT_REFRESH_EXPIRE_TIME,
   },
 
 //   mail: {

@@ -7,11 +7,13 @@ import { mapCreateTransaction } from './mappers/create-transaction.mapper';
 import { buildQueryDto } from 'src/common/dto/base-query.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
 import { mapUpdateTransaction } from './mappers/update-transaction.mapper';
+import { TreasuryExportService } from './export/treasury-export.service';
 
 @Injectable()
 export class TreasuryService {
   constructor(
     private readonly transactionRepo: TransactionRepository,
+     private readonly exportService: TreasuryExportService,
     @InjectConnection() private readonly connection: Connection,
   ) {}
 
@@ -60,4 +62,11 @@ async updateTransaction(transactionId: string, dto: UpdateTransactionDto) {
       return this.transactionRepo.delete(transactionId, session);
     });
   }
+   async exportTransactionsExcel(query: buildQueryDto) {
+
+    const transactions = await this.transactionRepo.findForExport(query);
+
+    return this.exportService.generateTransactionsExcel(transactions);
+  }
+
 }

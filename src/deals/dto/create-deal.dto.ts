@@ -96,16 +96,16 @@ export class CreateDealDto {
   @Min(0)
   remainingAmount: number;
 
-    @ApiProperty({
-    description: 'Required Amount in EGP',
-    example: 1500000,
-    minimum: 0,
-  })
-  @IsOptional()
-  @Type(() => Number)
-  @IsNumber()
-  @Min(0)
-  requiredAmount:number
+@ApiPropertyOptional({
+  description: 'Required Amount in EGP',
+  example: 1500000,
+  minimum: 0,
+})
+@IsOptional()
+@Type(() => Number)
+@IsNumber()
+@Min(0)
+requiredAmount: number;
 
   @ApiPropertyOptional()
   @IsString()
