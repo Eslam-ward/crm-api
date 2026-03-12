@@ -71,8 +71,8 @@ export class DealsService {
   async findOne(id: string): Promise<Deal> {
     const deal = await this.dealModel
       .findById(id)
-      .populate('unit', 'images unitCode type -_id')
-      .populate('salesAgent', 'fullName -_id');
+      .populate('unit', 'images unitCode type ')
+      .populate('salesAgent', 'fullName ');
 
     if (!deal) {
       throw new NotFoundException('Deal not found');
