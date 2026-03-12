@@ -17,10 +17,23 @@ import { AreasModule } from './areas/areas.module';
 import { EventModule } from './event/event.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { TreasuryModule } from './treasury/treasury.module';
-
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
+    ThrottlerModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        throttlers: [
+          {
+            ttl: config.getOrThrow<number>('rateLimit.ttl'),
+            limit: config.getOrThrow<number>('rateLimit.limit'),
+          },
+        ],
+      }),
+    }),
+
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],
@@ -32,8 +45,6 @@ import { TreasuryModule } from './treasury/treasury.module';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         uri: config.getOrThrow<string>('database.uri'),
-
-        
       }),
     }),
 
@@ -49,8 +60,14 @@ import { TreasuryModule } from './treasury/treasury.module';
     AreasModule,
     EventModule,
     DashboardModule,
-    TreasuryModule
- 
+    TreasuryModule,
+  ],
+
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
   ],
 })
 export class AppModule {}

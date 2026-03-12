@@ -1,5 +1,3 @@
-
-
 export default () => ({
   app: {
     nodeEnv: process.env.NODE_ENV || 'development',
@@ -10,7 +8,7 @@ export default () => ({
     uri: process.env.MONGO_URI,
   },
 
-   jwt: {
+  jwt: {
     secret: process.env.JWT_SECRET_KEY,
     expiresIn: process.env.JWT_EXPIRE_TIME,
   },
@@ -20,21 +18,23 @@ export default () => ({
     expiresIn: process.env.JWT_REFRESH_EXPIRE_TIME,
   },
 
-//   mail: {
-//     host: process.env.SMTP_HOST,
-//     port: process.env.SMTP_PORT
-//       ? parseInt(process.env.SMTP_PORT, 10)
-//       : undefined,
-//     user: process.env.SMTP_USER,
-//     pass: process.env.SMTP_PASS,
-//   },
+  rateLimit: {
+    ttl: process.env.RATE_LIMIT_TTL
+      ? parseInt(process.env.RATE_LIMIT_TTL, 10)
+      : 60000,
 
-//   rateLimit: {
-//     ttl: process.env.RATE_LIMIT_TTL
-//       ? parseInt(process.env.RATE_LIMIT_TTL, 10)
-//       : 60,
-//     limit: process.env.RATE_LIMIT_MAX
-//       ? parseInt(process.env.RATE_LIMIT_MAX, 10)
-//       : 10,
-//   },
+    limit: process.env.RATE_LIMIT_LIMIT
+      ? parseInt(process.env.RATE_LIMIT_LIMIT, 10)
+      : 100,
+  },
+
+  authRateLimit: {
+    ttl: process.env.AUTH_RATE_LIMIT_TTL
+      ? parseInt(process.env.AUTH_RATE_LIMIT_TTL, 10)
+      : 60000,
+
+    limit: process.env.AUTH_RATE_LIMIT_LIMIT
+      ? parseInt(process.env.AUTH_RATE_LIMIT_LIMIT, 10)
+      : 5,
+  },
 });

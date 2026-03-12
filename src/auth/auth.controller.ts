@@ -22,9 +22,11 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { Throttle } from '@nestjs/throttler';
 
 @ApiTags('Auth')
 @Controller('auth')
+@Throttle({ default: { limit: 5, ttl: 60000 } })
 export class AuthController {
   constructor(private authService: AuthService) {}
 
@@ -63,6 +65,7 @@ export class AuthController {
     },
   })
   @ApiOkResponse({ description: 'Password reset email sent' })
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
   @Post('forgot-password')
   forgot(@Body('email') email: string) {
     return this.authService.forgotPassword(email);

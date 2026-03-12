@@ -1,12 +1,14 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import * as bcrypt from 'bcrypt';
 
 import { User, UserDocument } from './schema/users.schema';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -17,6 +19,7 @@ import { UploadService } from 'src/common/storage/upload.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { generateToken } from 'src/common/utils/generate-token';
 import { JwtService } from '@nestjs/jwt';
+import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Injectable()
 export class UsersService {
@@ -45,6 +48,24 @@ export class UsersService {
     const token = generateToken(user.id, this.jwtService);
 
     return UserResponseDto.fromEntity(user, token);
+  }
+   //  Find All users
+    async findAll(query: buildQueryDto) {
+    const features = new ApiFeatures(this.userModel.find(), query)
+      .filter()
+      .search(['email', 'fullName']);
+
+    const total = await features.count();
+
+    features.sort().limitFields().paginate(total);
+
+    const data = await features.exec();
+
+    return {
+      results: data.length,
+      pagination: features.paginationResult,
+      data: data.map((user) => UserResponseDto.fromEntity(user)),
+    };
   }
 
   //  Find One (only active users)
@@ -116,23 +137,31 @@ export class UsersService {
     return { message: 'User deleted permanently' };
   }
 
-  //  Find All
+ 
 
-  async findAll(query: buildQueryDto) {
-    const features = new ApiFeatures(this.userModel.find(), query)
-      .filter()
-      .search(['email', 'fullName']);
 
-    const total = await features.count();
+async changePassword(userId: string, dto: ChangePasswordDto) {
+  const user = await this.userModel.findById(userId).select('+password');
+  if (!user) throw new NotFoundException(`User not found with id: ${userId}`);
 
-    features.sort().limitFields().paginate(total);
+  const isMatch = await bcrypt.compare(dto.currentPassword, user.password);
+  if (!isMatch) throw new ForbiddenException('Current password is incorrect');
 
-    const data = await features.exec();
-
-    return {
-      results: data.length,
-      pagination: features.paginationResult,
-      data: data.map((user) => UserResponseDto.fromEntity(user)),
-    };
+  if (dto.password !== dto.confirmPassword) {
+    throw new ForbiddenException('Password and confirm password must match');
   }
+
+    user.password = dto.password;
+  await user.save();
+
+  
+  const newToken = generateToken(user.id, this.jwtService);
+
+  return {
+    message: 'Password changed successfully',
+    accessToken:newToken, 
+  };
+}
+
+
 }

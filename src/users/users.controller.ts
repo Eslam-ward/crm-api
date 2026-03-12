@@ -30,33 +30,43 @@ import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { CreateUserDto } from './dto/create-user.dto';
+import { ChangePasswordDto } from './dto/change-password.dto';
+import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 @ApiTags('Users')
 @ApiBearerAuth()
 @Controller('users')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('super_admin', 'admin')
+
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
 
     @ApiOperation({ summary: 'create new user' })
     @ApiCreatedResponse({ description: 'User created successfully' })
+    // @Roles('super_admin', 'admin')
     @Post('create')
-    @UseInterceptors(FilesInterceptor('images',5))
+    @UseInterceptors(FilesInterceptor('images',2))
     create(@Body() dto:CreateUserDto,@UploadedFiles() files: Express.Multer.File[]) {
       return this.usersService.create(dto, files);
     }
 
 
-
+  @Roles('super_admin', 'admin')
   @Get()
-  async findAll(@Query() query: buildQueryDto) {
+  async findAll(@Query() query: buildQueryDto){
     return this.usersService.findAll(query);
   }
+   @ApiOperation({ summary: 'Change user password' })
+  @ApiOkResponse({ description: 'Password changed  successfully' })
+  @Patch('change-password')
+async changePassword(@CurrentUser('_id') userId: string, @Body() dto: ChangePasswordDto) {
+  return this.usersService.changePassword(userId, dto);
+}
 
   @ApiOperation({ summary: 'Get user by id' })
   @ApiParam({ name: 'id', description: 'User ID' })
   @ApiOkResponse({ type: UserResponseDto })
+  @Roles('super_admin', 'admin')
   @Get(':id')
   async findOne(@Param('id', ParseObjectIdPipe) id: string): Promise<UserResponseDto> {
     return this.usersService.findOne(id);
@@ -65,8 +75,8 @@ export class UsersController {
   @ApiOperation({ summary: 'Update user' })
   @ApiParam({ name: 'id', description: 'User ID' })
   @ApiOkResponse({ type: UserResponseDto })
-  
-  @UseInterceptors(FilesInterceptor('images', 5))
+  @Roles('super_admin', 'admin')
+  @UseInterceptors(FilesInterceptor('images', 2))
   @Patch(':id')
   async update(
     @Param('id', ParseObjectIdPipe) id: string,
@@ -76,6 +86,7 @@ export class UsersController {
     return this.usersService.updateUser(id, dto, files);
   }
 // Soft Delete - Admin Only
+@Roles('super_admin', 'admin')
   @ApiOperation({ summary: 'Deactivate user' })
   @ApiParam({ name: 'id', description: 'User ID' })
   @ApiOkResponse({ description: 'User deactivated successfully' })
@@ -85,6 +96,7 @@ export class UsersController {
   }
 
   // hard delete - Admin Only
+  @Roles('super_admin', 'admin')
   @ApiOperation({ summary: 'Delete user permanently' })
   @ApiParam({ name: 'id', description: 'User ID' })
   @ApiOkResponse({ description: 'User deleted successfully' })
@@ -93,4 +105,5 @@ export class UsersController {
     return this.usersService.hardDelete(id);
 
   }
+ 
 }
