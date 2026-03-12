@@ -8,7 +8,7 @@ import { StringValue } from 'ms';
 import { User, UserSchema } from '../users/schema/users.schema';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
-import { JwtStrategy } from 'src/common/strategies/jwt.strategy';
+import { JwtStrategy } from 'src/auth/strategies/jwt.strategy';
 import { UploadService } from 'src/common/storage/upload.service';
 
 @Module({

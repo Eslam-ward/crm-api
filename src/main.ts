@@ -3,9 +3,19 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { useContainer } from 'class-validator';
 import { setupSwagger } from './config/swagger.config';
+import compression from 'compression';
+import morgan from 'morgan';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  app.use(compression());
+  //  Helmet - sets security HTTP headers
+  app.use(helmet());
+
+  app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev')); // or  'tiny', 'short', 'common'
+
   app.setGlobalPrefix('api/v1');
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
   app.useGlobalPipes(
@@ -16,7 +26,7 @@ async function bootstrap() {
       transformOptions: { enableImplicitConversion: true },
     }),
   );
-  // Enable CORS for all origins (you can customize this for production)
+
   app.enableCors({
     origin: '*',
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',

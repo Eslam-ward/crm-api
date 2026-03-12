@@ -21,7 +21,6 @@ import { TreasuryModule } from './treasury/treasury.module';
 
 @Module({
   imports: [
-    
     ConfigModule.forRoot({
       isGlobal: true,
       load: [configuration],

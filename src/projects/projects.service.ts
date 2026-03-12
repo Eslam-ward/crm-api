@@ -185,18 +185,32 @@ async getDashboardSummary() {
 
 
 async getoneProductSummary(projectId: string) {
-
-
-  const [units, availableUnits, soldUnits] = await Promise.all([
-    this.unitModel.countDocuments({ project: projectId}),
-    this.unitModel.countDocuments({ status: 'available', project:projectId }),
-    this.unitModel.countDocuments({ status: 'sold', project: projectId}),
+  const [units, availableUnits, soldUnits, priceData] = await Promise.all([
+    this.unitModel.countDocuments({ project: projectId }),
+    this.unitModel.countDocuments({ status: 'available', project: projectId }),
+    this.unitModel.countDocuments({ status: 'sold', project: projectId }),
+    this.unitModel.aggregate([
+      { $match: { project: new Types.ObjectId(projectId), status: 'sold' } },
+      { $group: { _id: null, avgPrice: { $avg: '$price' } } },
+    ]),
   ]);
+
+  const completionRate = units > 0
+    ? parseFloat(((soldUnits / units) * 100).toFixed(1))
+    : 0;
+
+  const averagePrice = priceData[0]?.avgPrice
+    ? parseFloat((priceData[0].avgPrice / 1_000_000  ).toFixed(1))
+    : 0;
 
   return {
     totalUnits: units,
     availableUnits,
     soldUnits,
+    quickStats: {
+      completionRate,   // 62.9
+      averagePrice,     // 3.2 M
+    },
   };
 }
 
