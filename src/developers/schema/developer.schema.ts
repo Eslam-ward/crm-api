@@ -28,6 +28,11 @@ export class Developer {
     @Prop({ type: [String] , trim: true })
     area: string[];
 
+@Prop({ type: String,required:true})
+  site:string 
+
+
+
 
 
    

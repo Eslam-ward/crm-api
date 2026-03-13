@@ -48,13 +48,18 @@ export class CreateDeveloperDto {
   @IsString()
   @IsOptional()
   location?: string;
+    @ApiPropertyOptional({
+    example: 'website links',
+  })
+  @IsString()
+  @IsOptional()
+  site:string 
 
   @ApiPropertyOptional({
     type: [String],
     example: ['Nasr City', 'Maadi'],
     description: 'List of working areas',
   })
-  @IsArray()
   @IsString({ each: true })
   @IsOptional()
   area?: string[];
