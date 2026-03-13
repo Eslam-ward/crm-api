@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Deal, DealDocument} from './schema/deal.schema';
 import { Unit, UnitDocument } from '../units/schema/unit.schema';
 import { UnitStatus } from '../units/enums/unit-status.enum';
@@ -35,7 +35,11 @@ export class DealsService {
       throw new BadRequestException('Unit already sold');
     }
 
-    const deal = await this.dealModel.create(createDealDto);
+    const deal = await this.dealModel.create({
+        ...createDealDto,
+    client: new Types.ObjectId(createDealDto.client), // ✅
+    unit: new Types.ObjectId(createDealDto.unit)
+    });
     if (createDealDto.status === 'CLOSED_WON') {
       unit.status = UnitStatus.SOLD;
       await unit.save();

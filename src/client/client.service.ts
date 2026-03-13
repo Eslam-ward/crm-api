@@ -103,18 +103,85 @@ export class ClientService {
     };
   }
 
-  //  Client Detailed Analytics
-  async getClientAnalytics(clientId: string) {
-    return this.dealModel.aggregate([
-      { $match: { client: new Types.ObjectId(clientId) } },
-      {
-        $group: {
-          _id: '$client',
-          totalDeals: { $sum: 1 },
-          totalValue: { $sum: '$value' },
-          properties: { $push: '$unit' },
+
+
+async getClientAnalytics(clientId: string) {
+  const result = await this.dealModel.aggregate([
+    {
+      $match: {
+        client: new Types.ObjectId(clientId),
+        status: 'CLOSED_WON',
+      },
+    },
+    {
+      $lookup: {
+        from: 'units',
+        localField: 'unit',
+        foreignField: '_id',
+        as: 'unit',
+      },
+    },
+    { $unwind: '$unit' },
+    { $sort: { createdAt: -1 } },
+    {
+      $group: {
+        _id: '$client',
+        totalDeals: { $sum: 1 },
+        totalSpent: { $sum: '$value' },
+        properties: {
+          $addToSet: {
+            unitId: '$unit._id',
+            unitCode: '$unit.unitCode',
+          },
+        },
+        lastDeals: { 
+          $push: {
+            unitName: '$unit.unitCode',
+            dealDate: '$createdAt',
+            status: '$status',
+            value: '$value',
+          },
         },
       },
-    ]);
+    },
+    {
+      $addFields: {
+        lastDeals: {
+          $map: {
+            input: { $slice: ['$lastDeals', 3] }, 
+            as: 'deal',
+            in: {
+              unitName: '$$deal.unitName',
+              dealDate: { $dateToString: { format: "%Y-%m-%d", date: "$$deal.dealDate" } },
+              status: '$$deal.status',
+              value: '$$deal.value',
+            },
+          },
+        },
+      },
+    },
+    {
+      $project: {
+        _id: 0,
+        totalDeals: 1,
+        totalSpent: 1,
+        totalProperties: { $size: '$properties' },
+        properties: 1,
+        lastDeals: 1,
+      },
+    },
+  ]);
+
+  if (!result.length) {
+    return {
+      totalDeals: 0,
+      totalSpent: 0,
+      totalProperties: 0,
+      properties: [],
+      lastDeals: [],
+    };
   }
+
+  return result[0];
+}
 }

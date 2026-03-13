@@ -87,3 +87,4 @@ export const DealSchema = SchemaFactory.createForClass(Deal);
 DealSchema.index({ status: 1 });
 DealSchema.index({ salesAgent: 1 });
 DealSchema.index({ createdAt: -1 });
+DealSchema.index({ client: 1 })

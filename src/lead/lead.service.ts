@@ -31,7 +31,11 @@ export class LeadsService {
 
   async findAll(query:buildQueryDto) {
       const features = new ApiFeatures(
-         this.leadModel.find().lean(),
+         this.leadModel.find().populate({
+        path: "assignedTo",
+        select: "fullName "
+      }).lean(),
+      
          query,
        )
          .filter()
@@ -51,7 +55,7 @@ export class LeadsService {
   }
 
   async findOne(id: string): Promise<Lead> {
-    const lead = await this.leadModel.findById(id);
+    const lead = await this.leadModel.findById(id).populate("assignedTo fullName");
 
     if (!lead) {
       throw new NotFoundException('Lead not found');

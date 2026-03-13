@@ -64,13 +64,13 @@ export class ClientController {
 
   @Get(':id/analytics')
   @ApiOperation({ summary: 'Get client analytics' })
-  getAnalytics(@Param('id', ParseObjectIdPipe) id: string) {
+  getAnalytics(@Param('id') id: string) {
     return this.clientService.getClientAnalytics(id);
   }
 
   @Delete(':id')
   @ApiOperation({ summary: 'Delete client' })
-  remove(@Param('id', ParseObjectIdPipe) id: string) {
+  remove(@Param('id') id: string) {
     return this.clientService.remove(id);
   }
 }
