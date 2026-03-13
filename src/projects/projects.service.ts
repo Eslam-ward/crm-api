@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -31,7 +32,9 @@ async create(
 ): Promise<Project> {
 
   
-
+  if (!files?.length) {
+      throw new BadRequestException(' image is required');
+    }
  
   const images =await this.imageService.upload(files)
 

@@ -34,6 +34,9 @@ export class UnitsService {
     if (existingUnit) {
       throw new ConflictException(`Unit with this code already exists`);
     }
+      if (!files?.length) {
+          throw new BadRequestException(' image is required');
+      }
 
     // 1 Upload images
     const images = await this.uploadService.upload(files)

@@ -31,10 +31,7 @@ export class LeadsService {
 
   async findAll(query:buildQueryDto) {
       const features = new ApiFeatures(
-         this.leadModel.find().populate({
-        path: "assignedTo",
-        select: "fullName "
-      }).lean(),
+         this.leadModel.find().populate("assignedTo","fullName").lean(),
       
          query,
        )

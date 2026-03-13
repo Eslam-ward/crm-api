@@ -38,10 +38,9 @@ export class UsersService {
     const existing = await this.userModel.findOne({ email: dto.email });
 
     if (existing) throw new UnauthorizedException('Email already in use');
-    if (!files?.length) {
-      throw new BadRequestException(' image is required');
-    }
+   
     const images = await this.imageService.upload(files);
+    
 
     const user = await this.userModel.create({ ...dto, images });
 
