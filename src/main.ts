@@ -14,8 +14,8 @@ async function bootstrap() {
   //  Helmet - sets security HTTP headers
   app.use(helmet());
 
-  app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev')); // or  'tiny', 'short', 'common'
-
+  app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));  // or  'tiny', 'short', 'common'
+   
   app.setGlobalPrefix('api/v1');
   useContainer(app.select(AppModule), { fallbackOnErrors: true });
   app.useGlobalPipes(

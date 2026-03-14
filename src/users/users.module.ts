@@ -7,6 +7,8 @@ import { UploadService } from 'src/common/storage/upload.service';
 import { JwtModule, JwtModuleOptions } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { StringValue } from 'ms';
+import { UsersRepository } from './repositories/user.repository';
+import { USERS_REPOSITORY } from './repositories/users.repository.interface';
 
 @Module({
   imports: [
@@ -27,6 +29,10 @@ import { StringValue } from 'ms';
         }),
   ],
   controllers: [UsersController],
-  providers: [UsersService,UploadService]
+  providers: [UsersService,UploadService,   UsersRepository,
+    {
+      provide: USERS_REPOSITORY,  
+      useClass: UsersRepository,
+    },]
 })
 export class UserModule {}
