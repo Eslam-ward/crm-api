@@ -1,174 +1,144 @@
 import {
-  BadRequestException,
   ConflictException,
   ForbiddenException,
+  Inject,
   Injectable,
   NotFoundException,
-  UnauthorizedException,
 } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
 
-import { User, UserDocument } from './schema/users.schema';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { ApiFeatures } from 'src/common/utils/api-features';
-import { buildQueryDto } from '../common/dto/base-query.dto';
+import { USERS_REPOSITORY } from './repositories/users.repository.interface';
+import type { IUsersRepository } from './repositories/users.repository.interface';
+import type { UpdateUserDto } from './dto/update-user.dto';
+import type { buildQueryDto } from '../common/dto/base-query.dto';
+import type { CreateUserDto } from './dto/create-user.dto';
+import type { ChangePasswordDto } from './dto/change-password.dto';
 import { UserResponseDto } from './dto/user-response.dto';
 import { UploadService } from 'src/common/storage/upload.service';
-import { CreateUserDto } from './dto/create-user.dto';
 import { generateToken } from 'src/common/utils/generate-token';
-import { JwtService } from '@nestjs/jwt';
-import { ChangePasswordDto } from './dto/change-password.dto';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectModel(User.name)
-    private readonly userModel: Model<UserDocument>,
+    @Inject(USERS_REPOSITORY)
+    private readonly usersRepository: IUsersRepository,
     private readonly imageService: UploadService,
-    private jwtService: JwtService,
+    private readonly jwtService: JwtService,
   ) {}
 
   async create(
     dto: CreateUserDto,
     files: Express.Multer.File[],
   ): Promise<UserResponseDto> {
-    // check if email exists
-    const existing = await this.userModel.findOne({ email: dto.email });
+    const existing = await this.usersRepository.findByEmail(dto.email);
+    if (existing) throw new ConflictException('Email already in use');
 
-    if (existing) throw new UnauthorizedException('Email already in use');
-   
-     const images = files?.length ? await this.imageService.upload(files) : [];
-    
+    const images = files?.length ? await this.imageService.upload(files) : [];
 
-    const user = await this.userModel.create({ ...dto, images });
+    const user = await this.usersRepository.create({ ...dto, images });
 
     const token = generateToken(user.id, this.jwtService);
 
     return UserResponseDto.fromEntity(user, token);
   }
-   //  Find All users
-    async findAll(query: buildQueryDto) {
-    const features = new ApiFeatures(this.userModel.find(), query)
-      .filter()
-      .search(['email', 'fullName']);
 
-    const total = await features.count();
 
-    features.sort().limitFields().paginate(total);
-
-    const data = await features.exec();
+  async findAll(query: buildQueryDto) {
+    const { results, pagination, data } =
+      await this.usersRepository.findAll(query);
 
     return {
-      results: data.length,
-      pagination: features.paginationResult,
+      results,
+      pagination,
       data: data.map((user) => UserResponseDto.fromEntity(user)),
     };
   }
 
-  //  Find One (only active users)
-  async findOne(id: string): Promise<UserResponseDto> {
-    const user = await this.userModel.findOne({
-      _id: id,
-    });
 
-    if (!user)
-      throw new NotFoundException(`No active user found with id: ${id}`);
+  async findOne(id: string): Promise<UserResponseDto> {
+    const user = await this.usersRepository.findById(id);
+    if (!user) throw new NotFoundException(`No active user found with id: ${id}`);
 
     return UserResponseDto.fromEntity(user);
   }
 
-  //  Update User
+
   async updateUser(
     id: string,
     dto: UpdateUserDto,
     files?: Express.Multer.File[],
   ): Promise<UserResponseDto> {
-    const user = await this.userModel.findById(id);
+    const user = await this.usersRepository.findById(id);
+    if (!user) throw new NotFoundException(`No active user found with id: ${id}`);
 
-    if (!user)
-      throw new NotFoundException(`No active user found with id: ${id}`);
     if (dto.email) {
-      const exists = await this.userModel.findOne({
-        email: dto.email,
-        _id: { $ne: id },
-      });
-
-      if (exists) {
-        throw new ConflictException('Email already used');
-      }
+      const emailTaken = await this.usersRepository.findByEmailExcludingId(
+        dto.email,
+        id,
+      );
+      if (emailTaken) throw new ConflictException('Email already used');
     }
+
     if (files?.length) {
-      user.images = await this.imageService.replace(user.images, files);
+      dto['images'] = await this.imageService.replace(user.images, files);
     }
 
-    Object.assign(user, dto);
-    await user.save();
+    const updated = await this.usersRepository.updateById(user, dto);
 
-    return UserResponseDto.fromEntity(user);
+    return UserResponseDto.fromEntity(updated);
   }
 
-  //  Soft Delete
-async toggleUserActive(userId: string): Promise<{ message: string; isActive: boolean }> {
-  const user = await this.userModel.findById(userId);
-  if (!user) {
-    throw new NotFoundException('User not found');
+
+  async toggleUserActive(
+    userId: string,
+  ): Promise<{ message: string; isActive: boolean }> {
+    const user = await this.usersRepository.findById(userId);
+    if (!user) throw new NotFoundException('User not found');
+
+    if (user.isActive) {
+      user.isActive = false;
+      user.refreshToken = undefined;
+      await this.usersRepository.save(user);
+      return { message: 'User deactivated successfully', isActive: false };
+    }
+
+    user.isActive = true;
+    await this.usersRepository.save(user);
+    return { message: 'User activated successfully', isActive: true };
   }
 
-  if (user.isActive) {
-    user.isActive = false;
-    user.refreshToken = undefined;
-    await user.save();
-    return { message: 'User deactivated successfully', isActive: user.isActive };
-  }
 
-  user.isActive = true;
-  await user.save();
-  return { message: 'User activated successfully', isActive: user.isActive };
-}
-
-
-
-  //  Hard Delete
   async hardDelete(id: string): Promise<{ message: string }> {
-    const user = await this.userModel.findById(id);
-
-    if (!user) {
-      throw new NotFoundException('User not found');
-    }
+    const user = await this.usersRepository.findById(id);
+    if (!user) throw new NotFoundException('User not found');
 
     await this.imageService.deleteImages(user.images);
+    await this.usersRepository.deleteOne(user);
 
-    await user.deleteOne();
     return { message: 'User deleted permanently' };
   }
 
- 
 
+  async changePassword(userId: string, dto: ChangePasswordDto) {
+    const user = await this.usersRepository.findByIdWithPassword(userId);
+    if (!user) throw new NotFoundException(`User not found with id: ${userId}`);
 
-async changePassword(userId: string, dto: ChangePasswordDto) {
-  const user = await this.userModel.findById(userId).select('+password');
-  if (!user) throw new NotFoundException(`User not found with id: ${userId}`);
+    const isMatch = await bcrypt.compare(dto.currentPassword, user.password);
+    if (!isMatch) throw new ForbiddenException('Current password is incorrect');
 
-  const isMatch = await bcrypt.compare(dto.currentPassword, user.password);
-  if (!isMatch) throw new ForbiddenException('Current password is incorrect');
-
-  if (dto.password !== dto.confirmPassword) {
-    throw new ForbiddenException('Password and confirm password must match');
-  }
+    if (dto.password !== dto.confirmPassword) {
+      throw new ForbiddenException('Password and confirm password must match');
+    }
 
     user.password = dto.password;
-  await user.save();
+    await this.usersRepository.save(user);
 
-  
-  const newToken = generateToken(user.id, this.jwtService);
+    const newToken = generateToken(user.id, this.jwtService);
 
-  return {
-    message: 'Password changed successfully',
-    accessToken:newToken, 
-  };
-}
-
-
+    return {
+      message: 'Password changed successfully',
+      accessToken: newToken,
+    };
+  }
 }

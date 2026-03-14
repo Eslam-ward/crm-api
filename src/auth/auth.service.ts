@@ -2,51 +2,54 @@ import {
   Injectable,
   UnauthorizedException,
   NotFoundException,
+  ConflictException,
+  Inject,
 } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
-import { User } from '../users/schema/users.schema';
-import { RegisterDto } from './dto/register.dto';
+import { JwtService } from '@nestjs/jwt';
 
-import { LoginDto } from './dto/login.dto';
+import { USERS_REPOSITORY } from '../users/repositories/users.repository.interface';
+import type { IUsersRepository } from '../users/repositories/users.repository.interface';
+import type { RegisterDto } from './dto/register.dto';
+import type { LoginDto } from './dto/login.dto';
 import { UserResponseDto } from 'src/users/dto/user-response.dto';
 import { generateToken } from 'src/common/utils/generate-token';
-import { JwtService } from '@nestjs/jwt';
 import { UploadService } from 'src/common/storage/upload.service';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectModel(User.name) private userModel: Model<User>,
-    private jwtService: JwtService,
+    @Inject(USERS_REPOSITORY)
+    private readonly usersRepository: IUsersRepository,
+    private readonly jwtService: JwtService,
     private readonly imageService: UploadService,
   ) {}
+
+  // ── Register ───────────────────────────────────────────────
 
   async register(
     dto: RegisterDto,
     files: Express.Multer.File[],
   ): Promise<UserResponseDto> {
-    // check if email exists
-    const existing = await this.userModel.findOne({ email: dto.email });
+    const existing = await this.usersRepository.findByEmail(dto.email);
+    if (existing) throw new ConflictException('Email already in use');
 
-    if (existing) throw new UnauthorizedException('Email already in use');
     const images = files?.length ? await this.imageService.upload(files) : [];
-    const user = await this.userModel.create({ ...dto, images });
+    const user = await this.usersRepository.create({ ...dto, images });
 
     const token = generateToken(user.id, this.jwtService);
 
     return UserResponseDto.fromEntity(user, token);
   }
-  //   login
+
+  // ── Login ──────────────────────────────────────────────────
 
   async login(dto: LoginDto): Promise<UserResponseDto> {
-    const user = await this.userModel
-      .findOne({ email: dto.email })
-      .select('+password');
+    const user = await this.usersRepository.findByEmailWithPassword(dto.email);
 
     if (!user) throw new UnauthorizedException('Invalid email or password');
+
     if (!user.isActive) {
       throw new UnauthorizedException(
         'Your account has been deactivated. Please contact support.',
@@ -54,7 +57,6 @@ export class AuthService {
     }
 
     const isMatch = await bcrypt.compare(dto.password, user.password);
-
     if (!isMatch) throw new UnauthorizedException('Invalid email or password');
 
     const token = generateToken(user.id, this.jwtService);
@@ -62,34 +64,34 @@ export class AuthService {
     return UserResponseDto.fromEntity(user, token);
   }
 
-  //   forgot password
-  async forgotPassword(email: string) {
-    const user = await this.userModel.findOne({ email });
+  // ── Forgot Password ────────────────────────────────────────
 
-    if (!user) throw new NotFoundException(`No user found with this email`);
+  async forgotPassword(email: string): Promise<{ message: string }> {
+    const user = await this.usersRepository.findByEmail(email);
+    if (!user) throw new NotFoundException('No user found with this email');
 
     const resetCode = Math.floor(100000 + Math.random() * 900000).toString();
-
     const hashed = crypto.createHash('sha256').update(resetCode).digest('hex');
 
     user.passwordResetCode = hashed;
     user.passwordResetExpires = new Date(Date.now() + 10 * 60 * 1000);
     user.passwordResetVerified = false;
 
-    await user.save();
+    await this.usersRepository.save(user);
 
-    // call email service here
+    // TODO: call email service here with resetCode
 
     return { message: 'Reset code sent' };
   }
 
-  // logout
+  // ── Logout ─────────────────────────────────────────────────
+
   async logout(userId: string): Promise<{ message: string }> {
-    const user = await this.userModel.findById(userId);
+    const user = await this.usersRepository.findById(userId);
     if (!user) throw new NotFoundException('User not found');
 
     user.refreshToken = undefined;
-    await user.save();
+    await this.usersRepository.save(user);
 
     return { message: 'Logged out successfully' };
   }

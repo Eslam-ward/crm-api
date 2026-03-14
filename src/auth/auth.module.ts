@@ -10,6 +10,8 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { JwtStrategy } from 'src/auth/strategies/jwt.strategy';
 import { UploadService } from 'src/common/storage/upload.service';
+import { UsersRepository } from 'src/users/repositories/user.repository';
+import { USERS_REPOSITORY } from 'src/users/repositories/users.repository.interface';
 
 @Module({
   imports: [
@@ -34,7 +36,12 @@ import { UploadService } from 'src/common/storage/upload.service';
 
   controllers: [AuthController],
 
-  providers: [AuthService, JwtStrategy,UploadService],
+  providers: [AuthService, JwtStrategy,UploadService, UsersRepository,
+     {
+      provide: USERS_REPOSITORY,  
+      useClass: UsersRepository,
+    },
+  ],
 
   exports: [AuthService, JwtModule],
 })
