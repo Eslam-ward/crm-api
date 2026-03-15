@@ -41,7 +41,7 @@ const MAX_FILES = 5;
 @ApiTags('Units')
 @Controller('units')
 export class UnitsController {
-  constructor(private readonly unitsService: UnitsService) {}
+  constructor(private readonly unitsService:UnitsService) {}
 
   @ApiOperation({ summary: 'Create unit' })
   @ApiConsumes('multipart/form-data')
@@ -49,6 +49,7 @@ export class UnitsController {
 
   @Post()
   @UseInterceptors(FilesInterceptor('images', MAX_FILES))
+  
   create(
     @Body() dto: CreateUnitDto,
     @UploadedFiles() files: Express.Multer.File[],
@@ -67,6 +68,7 @@ export class UnitsController {
 
   @ApiOperation({ summary: 'Get all units' })
   @ApiOkResponse({ description: 'Return units list' })
+  @Roles('admin','super_admin','sales')
   @Get('all')
     @UseInterceptors(CacheInterceptor)
   @CacheKey('units_all')

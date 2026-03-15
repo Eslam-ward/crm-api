@@ -16,7 +16,7 @@ import {
 @ApiBearerAuth()
 @Controller('dashboard')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+@Roles('super_admin', 'admin', 'sales')
 export class DashboardController {
   constructor(private readonly dashboardService: DashboardService) {}
 

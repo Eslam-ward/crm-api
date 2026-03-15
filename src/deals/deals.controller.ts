@@ -30,17 +30,15 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 @ApiBearerAuth()
 @Controller('deals')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('super_admin', 'admin')
+@Roles('super_admin', 'admin', 'sales')
 export class DealsController {
   constructor(private readonly dealsService: DealsService) {}
 
-  
   @Post()
   @ApiOperation({ summary: 'Create new deal' })
   create(@Body() createDealDto: CreateDealDto) {
     return this.dealsService.create(createDealDto);
   }
-
   
   @Get()
   @ApiOperation({ summary: 'Get all deals' })
@@ -48,20 +46,17 @@ export class DealsController {
     return this.dealsService.findAll(query);
   }
 
-  
   @Get('pipeline/summary')
   @ApiOperation({ summary: 'Get pipeline summary analytics' })
   getPipelineSummary() {
     return this.dealsService.getPipelineSummary();
   }
 
-  
   @Get(':id')
   @ApiOperation({ summary: 'Get deal by id' })
   findOne(@Param('id') id: string) {
     return this.dealsService.findOne(id);
   }
-
 
   @Patch(':id')
   @ApiOperation({ summary: 'Update deal' })
@@ -72,7 +67,6 @@ export class DealsController {
     return this.dealsService.update(id, updateDealDto);
   }
 
-  
   @Patch(':id/status')
   @ApiOperation({ summary: 'Update deal status' })
   updateStatus(
@@ -82,7 +76,7 @@ export class DealsController {
     return this.dealsService.updateStatus(id, updateDealStatusDto);
   }
 
- 
+ @Roles('super_admin', 'admin')
   @Delete(':id')
   @ApiOperation({ summary: 'Delete deal' })
   remove(@Param('id') id: string) {

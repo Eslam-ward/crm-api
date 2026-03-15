@@ -34,7 +34,7 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 @ApiBearerAuth() 
 @Controller('events')
 @UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('super_admin', 'admin')
+@Roles('super_admin', 'admin', 'sales')
 export class EventController {
   constructor(private readonly eventService: EventService) {}
 
@@ -46,7 +46,6 @@ export class EventController {
   create(@Body() createEventDto: CreateEventDto) {
     return this.eventService.create(createEventDto);
   }
-
   @Get()
   @ApiOperation({ summary: 'Get all events with filtering & pagination' })
   @ApiQuery({ name: 'page', required: false, example: 1 })
@@ -79,13 +78,14 @@ export class EventController {
   })
   @ApiBody({ type: UpdateEventDto })
   @ApiResponse({ status: 200, description: 'Event updated successfully' })
+  @Roles('super_admin', 'admin')
   update(
     @Param('id', ParseObjectIdPipe) id: string,
     @Body() updateEventDto: UpdateEventDto,
   ) {
     return this.eventService.update(id, updateEventDto);
   }
-
+@Roles('super_admin', 'admin')
   @Delete(':id')
   @ApiOperation({ summary: 'Delete event by ID' })
   @ApiParam({
