@@ -18,7 +18,8 @@ import { EventModule } from './event/event.module';
 import { DashboardModule } from './dashboard/dashboard.module';
 import { TreasuryModule } from './treasury/treasury.module';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
+import { CacheInterceptor, CacheModule } from '@nestjs/cache-manager';
 
 @Module({
   imports: [
@@ -48,6 +49,11 @@ import { APP_GUARD } from '@nestjs/core';
       }),
     }),
 
+       CacheModule.register({
+      ttl: 60,
+      isGlobal: true, 
+    }),
+
     AuthModule,
     UserModule,
     DevelopersModule,
@@ -67,6 +73,10 @@ import { APP_GUARD } from '@nestjs/core';
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard,
+    },
+       {
+      provide: APP_INTERCEPTOR,
+      useClass: CacheInterceptor, 
     },
   ],
 })

@@ -32,6 +32,7 @@ import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
+import { CacheKey, CacheTTL, CacheInterceptor } from '@nestjs/cache-manager';
 
 const MAX_FILES = 5;
  @UseGuards(JwtAuthGuard, RolesGuard)
@@ -67,6 +68,9 @@ export class UnitsController {
   @ApiOperation({ summary: 'Get all units' })
   @ApiOkResponse({ description: 'Return units list' })
   @Get('all')
+    @UseInterceptors(CacheInterceptor)
+  @CacheKey('units_all')
+  @CacheTTL(60)
   findAll(@Query() query: buildQueryDto) {
     return this.unitsService.findAll(query);
   }
@@ -75,6 +79,9 @@ export class UnitsController {
   @ApiParam({ name: 'id', description: 'Unit ID' })
   @ApiOkResponse({ description: 'Return unit details' })
   @Get(':id')
+  @UseInterceptors(CacheInterceptor)
+  @CacheKey('units')
+  @CacheTTL(60)
   findOne(@Param('id', ParseObjectIdPipe) id: string) {
     return this.unitsService.findOne(id);
   }
