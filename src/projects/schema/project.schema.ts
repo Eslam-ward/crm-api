@@ -29,12 +29,7 @@ export class Project {
     required: true,
   })
   developer: Types.ObjectId; 
- @Prop({
-    type: Types.ObjectId,
-    ref:Area.name,
-    required: true,
-  })
-  area: string;
+
 
   @Prop({ required: true })
   startDate: Date;
