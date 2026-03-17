@@ -5,6 +5,7 @@ import {
   IsOptional,
   IsString,
   MinLength,
+  IsEnum
 } from 'class-validator';
 import { UserRole } from 'src/users/enums/roles.enum';
 import { IsPhoneNumberEGorSA } from 'src/common/validators/is-phone.validator';
