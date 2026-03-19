@@ -65,6 +65,7 @@ export class UnitsController {
   @ApiOperation({ summary: 'Get unit by id' })
   @ApiParam({ name: 'id', description: 'Unit ID' })
   @ApiOkResponse({ description: 'Return unit details' })
+  @Roles('admin','super_admin','sales')
   @Get(':id')
   findOne(@Param('id', ParseObjectIdPipe) id: string) {
     return this.unitsService.findOne(id);
@@ -74,6 +75,7 @@ export class UnitsController {
   @ApiParam({ name: 'id', description: 'Unit ID' })
   @ApiConsumes('multipart/form-data')
   @Patch(':id')
+  @Roles('admin','super_admin','sales')
   @UseInterceptors(FilesInterceptor('images', MAX_FILES))
   update(
     @Param('id', ParseObjectIdPipe) id: string,
