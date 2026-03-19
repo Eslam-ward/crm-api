@@ -1,11 +1,11 @@
-export interface AreaViewResponse {
+
+export interface IAreaViewResponse {
   name: string;
   location: string;
-  
   description?: string;
- 
-
-  totalUnits: number;
-  availableUnits: number;
-  availabilityRate: number;
+   stats: {
+    totalUnits: number;
+    availableUnits: number;
+    availabilityPercentage: number;
+  };
 }

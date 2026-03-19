@@ -50,22 +50,6 @@ export class UnitsService {
     return unit;
   }
 
-  async sellUnit(unitId: string): Promise<UnitDocument> {
-    const unit = await this.unitModel.findById(unitId);
-
-    if (!unit) {
-      throw new NotFoundException('Unit not found');
-    }
-
-    if (unit.status === UnitStatus.SOLD) {
-      throw new ConflictException('Unit is not available for sale');
-    }
-    // Mark unit as sold
-    unit.status = UnitStatus.SOLD;
-    await unit.save();
-
-    return unit;
-  }
 
   // @desc-> find all
   async findAll(query: buildQueryDto) {
@@ -73,7 +57,7 @@ export class UnitsService {
      const cached = await this.cacheManager.get('units_all');
     if (cached) return cached;
     const features = new ApiFeatures(
-      this.unitModel.find().populate('project', 'name -_id').populate('area', 'name  location -_id'),
+      this.unitModel.find().populate('project', 'name -_id').populate('area', 'name  location -_id').lean(),
       query,
     )
       .filter()
@@ -91,22 +75,22 @@ export class UnitsService {
       data: data,
     };
 
-    await this.cacheManager.set('units_all', response, { ttl: 60 }); 
+    await this.cacheManager.set('units_all', response); 
     return response;
   }
 
   // @desc-> find one by id
-  async findOne(id: string): Promise<UnitDocument> {
+  async findOne(id: string): Promise<Unit> {
      const cached = await this.cacheManager.get(`unit:${id}`);
     if (cached) return cached as UnitDocument;
 
     const unit = await this.unitModel
       .findById(id)
-      .populate('project', 'name -_id').populate('area', 'name  location -_id');
+      .populate('project', 'name -_id').populate('area', 'name  location -_id').lean();
     if (!unit) {
       throw new NotFoundException('Unit not found');
     }
-     await this.cacheManager.set(`unit:${id}`, unit, { ttl: 60 });
+     await this.cacheManager.set(`unit:${id}`, unit);
     return unit;
   }
 

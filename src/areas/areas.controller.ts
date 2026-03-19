@@ -10,8 +10,8 @@ import { Roles } from 'src/common/decorators/roles.decorator';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 @ApiTags('Areas')
 @ApiBearerAuth()
-@UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('admin', 'super_admin')
+// @UseGuards(JwtAuthGuard, RolesGuard)
+// @Roles('admin', 'super_admin')
 @Controller('areas')
 export class AreasController {
   constructor(private readonly areasService: AreasService) {}

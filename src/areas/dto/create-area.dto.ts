@@ -34,11 +34,6 @@ export class CreateAreaDto {
   project: string;
 
 
-
-
-
-
-
   @ApiPropertyOptional({
     example: 'This area is located near main road',
   })

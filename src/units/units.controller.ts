@@ -32,47 +32,32 @@ import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
 import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
-import { CacheKey, CacheTTL, CacheInterceptor } from '@nestjs/cache-manager';
 
 const MAX_FILES = 5;
- @UseGuards(JwtAuthGuard, RolesGuard)
- @Roles('admin','super_admin')
- @ApiBearerAuth() 
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('admin', 'super_admin', 'sales')
+@ApiBearerAuth()
 @ApiTags('Units')
 @Controller('units')
 export class UnitsController {
-  constructor(private readonly unitsService:UnitsService) {}
+  constructor(private readonly unitsService: UnitsService) {}
 
   @ApiOperation({ summary: 'Create unit' })
   @ApiConsumes('multipart/form-data')
   @ApiCreatedResponse({ description: 'Unit created successfully' })
-
   @Post()
   @UseInterceptors(FilesInterceptor('images', MAX_FILES))
-  
   create(
     @Body() dto: CreateUnitDto,
     @UploadedFiles() files: Express.Multer.File[],
   ) {
-    
     return this.unitsService.create(dto, files);
-  }
-
-  @ApiOperation({ summary: 'Sell unit' })
-  @ApiParam({ name: 'id', description: 'Unit ID' })
-  @ApiOkResponse({ description: 'Unit sold successfully' })
-  @Patch(':id/sell')
-  async sellUnit(@Param('id', ParseObjectIdPipe) id: string) {
-    return this.unitsService.sellUnit(id);
   }
 
   @ApiOperation({ summary: 'Get all units' })
   @ApiOkResponse({ description: 'Return units list' })
-  @Roles('admin','super_admin','sales')
+  @Roles('admin', 'super_admin', 'sales')
   @Get('all')
-    @UseInterceptors(CacheInterceptor)
-  @CacheKey('units_all')
-  @CacheTTL(60)
   findAll(@Query() query: buildQueryDto) {
     return this.unitsService.findAll(query);
   }
@@ -81,9 +66,6 @@ export class UnitsController {
   @ApiParam({ name: 'id', description: 'Unit ID' })
   @ApiOkResponse({ description: 'Return unit details' })
   @Get(':id')
-  @UseInterceptors(CacheInterceptor)
-  @CacheKey('units')
-  @CacheTTL(60)
   findOne(@Param('id', ParseObjectIdPipe) id: string) {
     return this.unitsService.findOne(id);
   }
@@ -91,7 +73,6 @@ export class UnitsController {
   @ApiOperation({ summary: 'Update unit' })
   @ApiParam({ name: 'id', description: 'Unit ID' })
   @ApiConsumes('multipart/form-data')
-
   @Patch(':id')
   @UseInterceptors(FilesInterceptor('images', MAX_FILES))
   update(
@@ -105,6 +86,7 @@ export class UnitsController {
   @ApiOperation({ summary: 'Delete unit' })
   @ApiParam({ name: 'id', description: 'Unit ID' })
   @ApiOkResponse({ description: 'Unit deleted successfully' })
+  @Roles('admin', 'super_admin')
   @Delete(':id')
   remove(@Param('id', ParseObjectIdPipe) id: string) {
     return this.unitsService.remove(id);

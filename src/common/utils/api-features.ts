@@ -3,7 +3,7 @@ import { IPaginationResult } from '../contracts/pagination.interfaces';
 import { IQueryBuilder } from '../contracts/query-builder.interface';
 
 
-export class ApiFeatures<T extends Document> implements IQueryBuilder<T> {
+export class ApiFeatures<T> implements IQueryBuilder<T> {
   private mongooseQuery: Query<T[], T>;
   private queryString: Record<string, any>;
   public paginationResult?: IPaginationResult;

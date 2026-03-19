@@ -1,9 +1,9 @@
-import { Injectable } from "@nestjs/common";
-import { InjectModel } from "@nestjs/mongoose";
-import { UnitStatus } from "src/units/enums/unit-status.enum";
-import { Area } from "./schema/area.schema";
-import { Model, Types } from "mongoose";
-import { AreaViewResponse } from "./interfaces/area-view-response.interface";
+import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model, Types } from 'mongoose';
+import { Area } from './schema/area.schema';
+import { UnitStatus } from 'src/units/enums/unit-status.enum';
+import { IAreaViewResponse } from './interfaces/area-view-response.interface';
 
 @Injectable()
 export class AreasAnalyticsService {
@@ -12,14 +12,8 @@ export class AreasAnalyticsService {
     private readonly areaModel: Model<Area>,
   ) {}
 
-
-
-
-async findByIds(
-  ids: Types.ObjectId[],
-): Promise<AreaViewResponse[]> {
-
-  return this.areaModel.aggregate<AreaViewResponse>([
+async findByIds(ids: Types.ObjectId[]): Promise<IAreaViewResponse[]> {
+  return this.areaModel.aggregate<IAreaViewResponse>([
     {
       $match: {
         _id: { $in: ids },
@@ -38,31 +32,39 @@ async findByIds(
               },
             },
           },
+
+        
           {
-            $project: {
-              status: 1,
+            $group: {
+              _id: null,
+              totalUnits: { $sum: 1 },
+              availableUnits: {
+                $sum: {
+                  $cond: [
+                    { $eq: ['$status', UnitStatus.AVAILABLE] },
+                    1,
+                    0,
+                  ],
+                },
+              },
             },
           },
         ],
-        as: 'units',
+        as: 'stats',
+      },
+    },
+
+    {
+      $unwind: {
+        path: '$stats',
+        preserveNullAndEmptyArrays: true,
       },
     },
 
     {
       $addFields: {
-        'stats.totalUnits': { $size: '$units' },
-
-        'stats.availableUnits': {
-          $size: {
-            $filter: {
-              input: '$units',
-              as: 'unit',
-              cond: {
-                $eq: ['$$unit.status', UnitStatus.AVAILABLE],
-              },
-            },
-          },
-        },
+        'stats.totalUnits': { $ifNull: ['$stats.totalUnits', 0] },
+        'stats.availableUnits': { $ifNull: ['$stats.availableUnits', 0] },
       },
     },
 
@@ -98,10 +100,14 @@ async findByIds(
         createdAt: -1,
       },
     },
+    {
+  $unset: 'stats._id',
+},
 
     {
       $project: {
-        _id:1,
+       
+        _id: 1,
         name: 1,
         location: 1,
         description: 1,
@@ -110,7 +116,4 @@ async findByIds(
     },
   ]);
 }
-
-
-
 }

@@ -18,7 +18,6 @@ export class Unit {
     type: String,
     enum: UnitType,
     required: true,
-    index: true,
   })
   type: UnitType;
 
@@ -26,7 +25,6 @@ export class Unit {
     type: String,
     enum: UnitPurpose,
     required: true,
-    index: true,
   })
   purpose: UnitPurpose;
 

@@ -11,6 +11,7 @@ import { MongooseModule } from '@nestjs/mongoose';
         MongooseModule.forFeature([
       { name: Unit.name, schema: UnitSchema },      
       { name: Project.name, schema: ProjectSchema },
+   
     ]),
   ],
   controllers: [UnitsController],

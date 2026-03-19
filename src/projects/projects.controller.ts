@@ -39,7 +39,7 @@ const MAX_FILES = 5;
 @ApiBearerAuth()
 @Controller('projects')
  @UseGuards(JwtAuthGuard, RolesGuard)
- @Roles('admin','super_admin')
+ @Roles('admin','super_admin','sales')
 export class ProjectsController {
   constructor(private readonly projectsService: ProjectsService) {}
 
