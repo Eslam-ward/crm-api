@@ -40,8 +40,6 @@ export class UpdateUserDto  {
         message: 'Phone number must be valid Egyptian or Saudi number',
       })
       phone: string;
-       @IsOptional()
-       @IsEnum(UserRole)
-       role: UserRole;
+
     
 }
