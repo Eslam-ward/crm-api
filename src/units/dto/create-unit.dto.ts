@@ -149,6 +149,9 @@ export class CreateUnitDto {
  @IsOptional()
   @IsString()
   building?: string;
+   @IsOptional()
+  @IsString()
+  group: string;
 
   // ================= VILLA =================
 
