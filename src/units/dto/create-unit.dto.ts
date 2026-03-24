@@ -127,6 +127,7 @@ export class CreateUnitDto {
     description: 'notes',
   })
   @IsOptional()
+  @IsString()
   notes:string
 
 
