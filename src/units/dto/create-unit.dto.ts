@@ -108,6 +108,7 @@ export class CreateUnitDto {
     example: 12,
   })
   @IsOptional()
+  
   @Min(0)
   apartmentNumber?: number;
 
