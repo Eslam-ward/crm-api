@@ -21,14 +21,14 @@ export class UsersRepository implements IUsersRepository {
   }
 
   async findByEmailWithPassword(email: string): Promise<UserDocument | null> {
-    return this.userModel.findOne({ email }).select('+password').exec();
+    return this.userModel.findOne({ email }).select('+password').lean().exec();
   }
 
   async findByEmailExcludingId(
     email: string,
     excludeId: string,
   ): Promise<UserDocument | null> {
-    return this.userModel.findOne({ email, _id: { $ne: excludeId } }).exec();
+    return this.userModel.findOne({ email, _id: { $ne: excludeId } }).lean().exec();
   }
 
   async findById(id: string): Promise<UserDocument | null> {

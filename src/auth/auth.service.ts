@@ -16,7 +16,6 @@ import type { LoginDto } from './dto/login.dto';
 import { UserResponseDto } from 'src/users/dto/user-response.dto';
 import { generateToken } from 'src/common/utils/generate-token';
 import { UploadService } from 'src/common/storage/upload.service';
-import { NotificationsService } from 'src/notification/notification.service';
 
 @Injectable()
 export class AuthService {
@@ -25,7 +24,7 @@ export class AuthService {
     private readonly usersRepository: IUsersRepository,
     private readonly jwtService: JwtService,
     private readonly imageService: UploadService,
-    private notificationsService: NotificationsService
+ 
   ) {}
 
   // ── Register ───────────────────────────────────────────────
@@ -48,7 +47,9 @@ export class AuthService {
   // ── Login ──────────────────────────────────────────────────
 
   async login(dto: LoginDto): Promise<UserResponseDto> {
+    const start = Date.now();
     const user = await this.usersRepository.findByEmailWithPassword(dto.email);
+    console.log('DB:', Date.now() - start);
 
     if (!user) throw new UnauthorizedException('Invalid email or password');
 
@@ -60,13 +61,11 @@ export class AuthService {
 
     const isMatch = await bcrypt.compare(dto.password, user.password);
     if (!isMatch) throw new UnauthorizedException('Invalid email or password');
+    console.log('bcrypt:', Date.now() - start);
 
     const token = generateToken(user.id, this.jwtService);
-    await this.notificationsService.sendToUser(
-  user._id.toString(),
-  'مرحباً!',
-  'تم تسجيل دخولك بنجاح',
-);
+    console.log('jwt:', Date.now() - start);
+
 
     return UserResponseDto.fromEntity(user, token);
   }

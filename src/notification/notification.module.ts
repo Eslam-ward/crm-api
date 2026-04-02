@@ -11,9 +11,10 @@ import { NotificationsGateway } from './notifications.gateway';
     MongooseModule.forFeature([
       { name: Notification.name, schema: NotificationSchema },
     ]),
-    JwtModule.register({
-      secret: process.env.JWT_SECRET,
-    }),
+       JwtModule.register({
+      secret: process.env.JWT_SECRET_KEY,  // ← المهم دي
+      signOptions: { expiresIn: '7d' },
+    })
   ],
   providers: [NotificationsService, NotificationsGateway],
   controllers: [NotificationsController],
