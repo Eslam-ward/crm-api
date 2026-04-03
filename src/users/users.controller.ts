@@ -45,7 +45,7 @@ export class UsersController {
     @ApiCreatedResponse({ description: 'User created successfully' })
     // @Roles('super_admin', 'admin')
     @Post('create')
-    @UseInterceptors(FilesInterceptor('images',2))
+    @UseInterceptors(FilesInterceptor('images',10))
     create(@Body() dto:CreateUserDto,@UploadedFiles() files: Express.Multer.File[]) {
       return this.usersService.create(dto, files);
     }

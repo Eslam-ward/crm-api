@@ -34,8 +34,8 @@ import { RolesGuard } from 'src/common/guards/roles.guard';
 import { Roles } from 'src/common/decorators/roles.decorator';
 
 const MAX_FILES = 10;
-@UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('admin', 'super_admin', 'sales')
+// @UseGuards(JwtAuthGuard, RolesGuard)
+// @Roles('admin', 'super_admin', 'sales')
 @ApiBearerAuth()
 @ApiTags('Units')
 @Controller('units')

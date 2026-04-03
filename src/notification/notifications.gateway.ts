@@ -49,8 +49,8 @@ async handleConnection(client: Socket) {
 
     this.logger.log(`User ${userId} connected — socket: ${client.id}`);
 
-  } catch(e) {   // ← أضف (e)
-    console.log('JWT ERROR:', e.message); // ← أضف ده
+  } catch(e) {   
+  
     client.disconnect();
   }
 }
@@ -63,12 +63,12 @@ async handleConnection(client: Socket) {
     }
   }
 
-  // بعت notification لـ user معين
+
   sendToUser(userId: string, notification: object) {
     this.server.to(`user:${userId}`).emit('notification', notification);
   }
 
-  // بعت لكل المتصلين (broadcast)
+
   broadcastToAll(notification: object) {
     this.server.emit('notification', notification);
   }

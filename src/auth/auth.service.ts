@@ -17,6 +17,8 @@ import { UserResponseDto } from 'src/users/dto/user-response.dto';
 import { generateToken } from 'src/common/utils/generate-token';
 import { UploadService } from 'src/common/storage/upload.service';
 
+
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -47,9 +49,7 @@ export class AuthService {
   // ── Login ──────────────────────────────────────────────────
 
   async login(dto: LoginDto): Promise<UserResponseDto> {
-    const start = Date.now();
     const user = await this.usersRepository.findByEmailWithPassword(dto.email);
-    console.log('DB:', Date.now() - start);
 
     if (!user) throw new UnauthorizedException('Invalid email or password');
 
@@ -61,10 +61,8 @@ export class AuthService {
 
     const isMatch = await bcrypt.compare(dto.password, user.password);
     if (!isMatch) throw new UnauthorizedException('Invalid email or password');
-    console.log('bcrypt:', Date.now() - start);
 
-    const token = generateToken(user.id, this.jwtService);
-    console.log('jwt:', Date.now() - start);
+   const token = generateToken(user._id.toString(), this.jwtService);
 
 
     return UserResponseDto.fromEntity(user, token);
