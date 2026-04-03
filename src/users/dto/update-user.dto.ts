@@ -5,6 +5,7 @@ import {
   IsOptional,
   IsString,
   MinLength,
+
 } from 'class-validator';
 import { UserRole } from 'src/users/enums/roles.enum';
 import { IsPhoneNumberEGorSA } from 'src/common/validators/is-phone.validator';
@@ -25,6 +26,9 @@ export class UpdateUserDto  {
       @IsOptional()
       @IsEmail()
       email: string;
+    @IsOptional()
+  @IsEnum(UserRole)
+  role: UserRole;
     
       @ApiProperty({
         example: '+201001234567',
@@ -36,8 +40,6 @@ export class UpdateUserDto  {
         message: 'Phone number must be valid Egyptian or Saudi number',
       })
       phone: string;
-       @IsOptional()
-       @IsEnum(UserRole)
-       role: UserRole;
+
     
 }

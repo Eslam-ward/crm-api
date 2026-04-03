@@ -127,6 +127,7 @@ export class CreateUnitDto {
     description: 'notes',
   })
   @IsOptional()
+  @IsString()
   notes:string
 
 
@@ -148,6 +149,9 @@ export class CreateUnitDto {
  @IsOptional()
   @IsString()
   building?: string;
+   @IsOptional()
+  @IsString()
+  group: string;
 
   // ================= VILLA =================
 

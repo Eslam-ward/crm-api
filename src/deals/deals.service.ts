@@ -37,7 +37,7 @@ export class DealsService {
 
     const deal = await this.dealModel.create({
         ...createDealDto,
-    client: new Types.ObjectId(createDealDto.client), // ✅
+    client: new Types.ObjectId(createDealDto.client),
     unit: new Types.ObjectId(createDealDto.unit)
     });
     if (createDealDto.status === 'CLOSED_WON') {
@@ -46,30 +46,29 @@ export class DealsService {
     }
     return deal;
   }
+async findAll(queryDto: buildQueryDto) {
+  const mongooseQuery = this.dealModel
+    .find()
+    .populate('unit', 'images unitCode type -_id')
+    .populate('salesAgent', 'fullName -_id')
+    .populate('client', 'fullName -_id');
 
-  async findAll(query: buildQueryDto) {
-    const features = new ApiFeatures(
-      this.dealModel
-        .find()
-        .populate('unit', 'images unitCode type -_id')
-        .populate('salesAgent', 'fullName -_id'),
-      query,
-    )
-      .filter()
-      .search(['unitCode', 'type']);
+  const features = new ApiFeatures(mongooseQuery, queryDto)
+    .filter()
+    .search(['unitCode', 'type']);
 
-    const total = await features.count();
+  const total = await features.count();
 
-    features.sort().limitFields().paginate(total);
+  features.sort().limitFields().paginate(total);
 
-    const data = await features.exec();
+  const data = await features.exec();
 
-    return {
-      results: data.length,
-      pagination: features.paginationResult,
-      data: data,
-    };
-  }
+  return {
+    results: data.length,
+    pagination: features.paginationResult,
+    data,
+  };
+} 
 
   // find one deal with populated unit and sales agent
   async findOne(id: string): Promise<Deal> {
