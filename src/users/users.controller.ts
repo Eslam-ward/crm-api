@@ -35,7 +35,7 @@ import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 @ApiTags('Users')
 @ApiBearerAuth()
 @Controller('users')
-// @UseGuards(JwtAuthGuard, RolesGuard)
+@UseGuards(JwtAuthGuard, RolesGuard)
 
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
@@ -43,7 +43,7 @@ export class UsersController {
 
     @ApiOperation({ summary: 'create new user' })
     @ApiCreatedResponse({ description: 'User created successfully' })
-    // @Roles('super_admin', 'admin')
+    @Roles('super_admin', 'admin')
     @Post('create')
     @UseInterceptors(FilesInterceptor('images',10))
     create(@Body() dto:CreateUserDto,@UploadedFiles() files: Express.Multer.File[]) {
