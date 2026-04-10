@@ -54,7 +54,7 @@ export class CreateAreaDto {
   })
  @IsOptional()
   @IsString()
-   createdBy: string;
+   createdBy?: string;
 
 
   @ApiPropertyOptional({
