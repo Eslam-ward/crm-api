@@ -31,6 +31,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { UserRole } from './enums/roles.enum';
+import { Public } from 'src/common/decorators/public.decorator';
 @ApiTags('Users')
 @ApiBearerAuth()
 @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
@@ -41,7 +42,6 @@ export class UsersController {
 
     @ApiOperation({ summary: 'create new user' })
     @ApiCreatedResponse({ description: 'User created successfully' })
-    
     @Post('create')
     @UseInterceptors(FilesInterceptor('images',10))
     create(@Body() dto:CreateUserDto,@UploadedFiles() files: Express.Multer.File[]) {

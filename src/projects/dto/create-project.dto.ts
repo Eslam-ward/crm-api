@@ -24,7 +24,7 @@ export class CreateProjectDto {
     example: 'Luxury residential project with modern design',
   })
   @IsString()
-  @IsNotEmpty()
+  @IsOptional()
   description: string;
 
   @ApiProperty({

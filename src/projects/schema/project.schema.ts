@@ -15,7 +15,7 @@ export class Project {
   @Prop({ required: true, trim: true })
   name: string;
 
-  @Prop({ required: true, trim: true })
+  @Prop({ type: String, trim: true })
   description: string;
 
   @Prop({ required: true, trim: true })

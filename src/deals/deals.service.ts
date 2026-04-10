@@ -53,9 +53,23 @@ async findAll(queryDto: buildQueryDto) {
     .populate('salesAgent', 'fullName -_id')
     .populate('client', 'fullName -_id');
 
+<<<<<<< HEAD
   const features = new ApiFeatures(mongooseQuery, queryDto)
     .filter()
     .search(['unitCode', 'type']);
+=======
+  async findAll(query: buildQueryDto) {
+    const features = new ApiFeatures(
+      this.dealModel
+        .find()
+        .populate('unit', 'images unitCode type -_id')
+        .populate('salesAgent', 'fullName -_id'),
+      .populate('client', 'fullName -_id'),
+      query,
+    )
+      .filter()
+      .search(['unitCode', 'type']);
+>>>>>>> 5e0a641 (Update deals.service.ts)
 
   const total = await features.count();
 

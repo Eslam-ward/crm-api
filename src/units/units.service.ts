@@ -85,7 +85,7 @@ export class UnitsService {
 
     const unit = await this.unitModel
       .findById(id)
-      .populate('project', 'name -_id').populate('area', 'name  location -_id').lean();
+      .populate('project', 'name -_id').populate('area', 'name  location -_id');
     if (!unit) {
       throw new NotFoundException('Unit not found');
     }
