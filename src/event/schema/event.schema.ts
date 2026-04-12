@@ -1,8 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
-import { Document, Types } from 'mongoose'
+import { HydratedDocument, Types } from 'mongoose'
 import { EventType } from '../enums/event-type.enum'
 
-export type EventDocument = Event & Document
+export type EventDocument = HydratedDocument<Event>;
 
 @Schema({ timestamps: true })
 export class Event {
@@ -29,8 +29,8 @@ export class Event {
   createdBy: string
 
 
-  @Prop({ type: Types.ObjectId, ref: 'Client' ,required:true})
-  client
+  @Prop({ type: String, trim: true ,required:true})
+  client: string
 
   @Prop({ type: Types.ObjectId, ref: 'User' ,required:true})
   assignedTo

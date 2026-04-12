@@ -30,7 +30,6 @@ export class EventHelper {
 
   static getPopulateQuery() {
     return [
-      { path: 'client', select: 'fullName phone' },
       { path: 'assignedTo', select: 'fullName' },
     ];
   }

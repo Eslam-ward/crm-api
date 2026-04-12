@@ -9,6 +9,7 @@ import {
 } from 'class-validator';
 import { EventType } from '../enums/event-type.enum';
 import { Exists } from 'src/common/validators/id-exists.validator';
+import { string } from 'joi';
 
 export class CreateEventDto {
 
@@ -66,8 +67,7 @@ export class CreateEventDto {
     description: 'Client ID',
   })
   @IsNotEmpty()
-  @IsMongoId()
-  @Exists('Client')
+  @IsString()
   client: string;
 
   @ApiProperty({
