@@ -25,7 +25,7 @@ export class Transaction {
   category: string;
 
   @Prop({
-    required: true,
+      type: String,
   })
   source: string;
 

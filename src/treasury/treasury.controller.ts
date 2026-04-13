@@ -16,7 +16,7 @@ import { UserRole } from 'src/users/enums/roles.enum';
 
 @ApiTags('Treasury Transactions')
 @ApiBearerAuth()
-@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
+@Roles( UserRole.SUPER_ADMIN)
 @Controller('treasury/transactions')
 export class TreasuryController {
   constructor(private readonly treasuryService: TreasuryService) {}

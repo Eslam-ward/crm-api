@@ -27,7 +27,7 @@ export class CreateTransactionDto {
   category: string;
 
   @ApiProperty({ description: 'Transaction source' })
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
   source: string;
 
