@@ -45,7 +45,6 @@ export class Deal {
   @Prop({
     type: Types.ObjectId,
     ref: 'Client',
-    required: true,
    
   })
   client: Types.ObjectId;

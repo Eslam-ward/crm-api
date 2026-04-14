@@ -2,9 +2,7 @@ import { Controller, Get, Post, Body, UseGuards, Query, Patch, Param, Delete, Re
 import { TreasuryService } from './treasury.service';
 import { CreateTransactionDto } from './dto/create-transaction.dto';
 import { UpdateTransactionDto } from './dto/update-transaction.dto';
-import { AuthGuard } from '@nestjs/passport';
-import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
-import { RolesGuard } from 'src/common/guards/roles.guard';
+
 import { Roles } from 'src/common/decorators/roles.decorator';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { buildQueryDto } from 'src/common/dto/base-query.dto';

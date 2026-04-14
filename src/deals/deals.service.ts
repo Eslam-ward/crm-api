@@ -40,10 +40,15 @@ export class DealsService {
     client: new Types.ObjectId(createDealDto.client),
     unit: new Types.ObjectId(createDealDto.unit)
     });
-    if (createDealDto.status === 'CLOSED_WON') {
-      unit.status = UnitStatus.SOLD;
-      await unit.save();
+ if (createDealDto.status === 'CLOSED_WON') {
+  await this.unitModel.updateOne(
+    { _id: createDealDto.unit },
+    {
+      status: UnitStatus.SOLD,
+      client: createDealDto.client,
     }
+  );
+}
     return deal;
   }
 async findAll(queryDto: buildQueryDto) {

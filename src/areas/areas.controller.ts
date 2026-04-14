@@ -4,14 +4,14 @@ import { CreateAreaDto } from './dto/create-area.dto';
 import { UpdateAreaDto } from './dto/update-area.dto';
 import { buildQueryDto } from 'src/common/dto/base-query.dto';
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
-import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
-import { RolesGuard } from 'src/common/guards/roles.guard';
-import { Roles } from 'src/common/decorators/roles.decorator';
+
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Roles } from 'src/common/decorators/roles.decorator';
+import { UserRole } from 'src/users/enums/roles.enum';
 @ApiTags('Areas')
 @ApiBearerAuth()
-// @UseGuards(JwtAuthGuard, RolesGuard)
-// @Roles('admin', 'super_admin')
+
+@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN,UserRole.SALES)
 @Controller('areas')
 export class AreasController {
   constructor(private readonly areasService: AreasService) {}
@@ -46,9 +46,9 @@ export class AreasController {
   ) {
     return this.areasService.update(id, updateAreaDto);
   }
-
+   @ApiOperation({ summary: 'Delete area' })
+@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete area' })
   remove(
     @Param('id', ParseObjectIdPipe) id: string,
   ) {

@@ -65,6 +65,14 @@ export class Unit {
   status: UnitStatus;
 
   @Prop({
+    type: Types.ObjectId,
+    ref: 'Client',
+    required: true,
+   
+  })
+  client: Types.ObjectId;
+
+  @Prop({
     type: String,
   })
   paymentType: string;

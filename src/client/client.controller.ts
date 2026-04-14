@@ -14,16 +14,16 @@ import { ClientService } from './client.service';
 import { CreateClientDto } from './dto/create-client.dto';
 import { buildQueryDto } from 'src/common/dto/base-query.dto';
 import { Roles } from 'src/common/decorators/roles.decorator';
-import { JwtAuthGuard } from 'src/common/guards/jwt-auth.guard';
-import { RolesGuard } from 'src/common/guards/roles.guard';
+
 import { ParseObjectIdPipe } from '@nestjs/mongoose';
 import { UpdateClientDto } from './dto/update-client.dto';
+import { UserRole } from 'src/users/enums/roles.enum';
 
 @ApiTags('Clients')
 @ApiBearerAuth()
 @Controller('clients')
-@UseGuards(JwtAuthGuard, RolesGuard)
-@Roles('admin', 'super_admin')
+
+@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.SALES)
 export class ClientController {
   constructor(private readonly clientService: ClientService) {}
 
@@ -67,7 +67,7 @@ export class ClientController {
   getAnalytics(@Param('id') id: string) {
     return this.clientService.getClientAnalytics(id);
   }
-
+@Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
   @Delete(':id')
   @ApiOperation({ summary: 'Delete client' })
   remove(@Param('id') id: string) {

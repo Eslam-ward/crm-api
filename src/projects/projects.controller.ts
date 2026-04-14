@@ -34,7 +34,7 @@ import { UserRole } from 'src/users/enums/roles.enum';
 import { Public } from 'src/common/decorators/public.decorator';
 
 
-const MAX_FILES = 10;
+const MAX_FILES = 15;
 
 @ApiTags('Projects')
 @ApiBearerAuth()

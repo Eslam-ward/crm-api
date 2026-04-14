@@ -31,7 +31,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
 import { CurrentUser } from 'src/common/decorators/current-user.decorator';
 import { UserRole } from './enums/roles.enum';
-import { Public } from 'src/common/decorators/public.decorator';
+
 @ApiTags('Users')
 @ApiBearerAuth()
 @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN)
@@ -49,7 +49,7 @@ export class UsersController {
     }
 
 
-  
+  @Roles(UserRole.ADMIN, UserRole.SUPER_ADMIN, UserRole.SALES)
   @Get()
   async findAll(@Query() query: buildQueryDto){
     return this.usersService.findAll(query);

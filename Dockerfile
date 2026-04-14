@@ -1,23 +1,24 @@
-# Use lightweight node image
-FROM node:20-alpine
+# ---------- BUILD STAGE ----------
+FROM node:20-alpine AS builder
 
-# Create app directory
 WORKDIR /app
 
-# Copy package files
 COPY package*.json ./
+RUN npm ci
 
-# Install dependencies
-RUN npm install
-
-# Copy source code
 COPY . .
-
-# Build nest app
 RUN npm run build
 
-# Expose app port
-EXPOSE 3000
+# ---------- PRODUCTION ----------
+FROM node:20-alpine
 
-# Run application
-CMD ["node", "dist/main"]
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci --omit=dev
+
+COPY --from=builder /app/dist ./dist
+
+ENV NODE_ENV=production
+
+CMD ["node", "dist/main.js"]

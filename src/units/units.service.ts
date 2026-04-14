@@ -7,7 +7,7 @@ import {
 import { CreateUnitDto } from './dto/create-unit.dto';
 import { UpdateUnitDto } from './dto/update-unit.dto';
 import { Model, Types } from 'mongoose';
-import {  InjectModel } from '@nestjs/mongoose';
+import { InjectModel } from '@nestjs/mongoose';
 import { Unit, UnitDocument } from './schema/unit.schema';
 import { UploadService } from 'src/common/storage/upload.service';
 import { ApiFeatures } from 'src/common/utils/api-features';
@@ -33,30 +33,31 @@ export class UnitsService {
       throw new ConflictException(`Unit with this code already exists`);
     }
 
-
     // 1 Upload images
-    const images = await this.uploadService.upload(files)
-      
+    const images = await this.uploadService.upload(files);
+
     const unit = await this.unitModel.create({
       ...createUnitDto,
-        area: new Types.ObjectId(createUnitDto.area),
-       project: new Types.ObjectId(createUnitDto.project),
+      area: new Types.ObjectId(createUnitDto.area),
+      project: new Types.ObjectId(createUnitDto.project),
       images,
     });
-    // @apply caching 
+    // @apply caching
     await this.cacheManager.del('units_all');
 
     return unit;
   }
 
-
   // @desc-> find all
   async findAll(query: buildQueryDto) {
-
     const cached = await this.cacheManager.get('units_all');
     if (cached) return cached;
     const features = new ApiFeatures(
-      this.unitModel.find().populate('project', 'name -_id').populate('area', 'name  location -_id').lean(),
+      this.unitModel
+        .find()
+        .populate('project', 'name -_id')
+        .populate('area', 'name  location -_id')
+        .lean(),
       query,
     )
       .filter()
@@ -68,28 +69,30 @@ export class UnitsService {
 
     const data = await features.exec();
 
-     const response = {
+    const response = {
       results: data.length,
       pagination: features.paginationResult,
       data: data,
     };
 
-    await this.cacheManager.set('units_all', response); 
+    await this.cacheManager.set('units_all', response);
     return response;
   }
 
   // @desc-> find one by id
   async findOne(id: string): Promise<Unit> {
-     const cached = await this.cacheManager.get(`unit:${id}`);
+    const cached = await this.cacheManager.get(`unit:${id}`);
     if (cached) return cached as UnitDocument;
 
     const unit = await this.unitModel
       .findById(id)
-      .populate('project', 'name -_id').populate('area', 'name  location -_id');
+      .populate('project', 'name -_id')
+      .populate('area', 'name  location -_id')
+      .populate('client', 'fullName -_id');
     if (!unit) {
       throw new NotFoundException('Unit not found');
     }
-     await this.cacheManager.set(`unit:${id}`, unit);
+    await this.cacheManager.set(`unit:${id}`, unit);
     return unit;
   }
 
