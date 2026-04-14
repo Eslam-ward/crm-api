@@ -88,7 +88,7 @@ export class UnitsService {
       .findById(id)
       .populate('project', 'name -_id')
       .populate('area', 'name  location -_id')
-      .populate('client', 'fullName -_id');
+      .populate('client', 'fullName email phone-_id');
     if (!unit) {
       throw new NotFoundException('Unit not found');
     }
